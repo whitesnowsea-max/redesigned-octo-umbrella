@@ -1,0 +1,15 @@
+{
+    "name": "saju-app",
+    "version": "1.0.0",
+    "description": "DJ 명리 - AI 사주 마스터",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1"
+    }
+}

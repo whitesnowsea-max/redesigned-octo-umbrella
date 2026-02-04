@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 사주 마스터 - DJ 명리</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+    <!-- Marked for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <!-- Main App Container (No Modal) -->
+    <div class="app-container" id="main-app">
+
+        <!-- Sidebar: Saju Chart -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="ph ph-sparkle"></i>
+                    <span>AI 명리</span>
+                </div>
+            </div>
+
+            <!-- API 키는 서버에서 관리되므로 숨김 처리 -->
+            <div class="api-key-section" style="display: none;">
+                <label for="apiKeyInput" style="font-size: 0.7rem;">Gemini API 키</label>
+                <div class="key-input-wrapper">
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="mini-input">
+                    <button id="saveKeyBtn" class="icon-btn"><i class="ph ph-check"></i></button>
+                </div>
+            </div>
+
+            <div class="section-title">내 사주 명식 (만세력)</div>
+
+            <div class="user-mini-profile" id="user-profile-display" style="display:none; margin-bottom: 1rem;">
+                <div class="avatar" id="sidebar-avatar">?</div>
+                <div class="user-info">
+                    <h3 id="display-name">방문자</h3>
+                    <span id="display-birth">생년월일 정보 없음</span>
+                </div>
+            </div>
+
+            <!-- Matrix for 4 Pillars -->
+            <div class="saju-grid">
+                <div class="grid-header">시주</div>
+                <div class="grid-header">일주</div>
+                <div class="grid-header">월주</div>
+                <div class="grid-header">년주</div>
+
+                <!-- Heavely Stems (Cheon-gan) -->
+                <div class="pillar-box" id="hour-stem">?</div>
+                <div class="pillar-box day-master" id="day-stem">?</div>
+                <div class="pillar-box" id="month-stem">?</div>
+                <div class="pillar-box" id="year-stem">?</div>
+
+                <!-- Earthly Branches (Ji-ji) -->
+                <div class="pillar-box" id="hour-branch">?</div>
+                <div class="pillar-box" id="day-branch">?</div>
+                <div class="pillar-box" id="month-branch">?</div>
+                <div class="pillar-box" id="year-branch">?</div>
+            </div>
+
+            <div class="analysis-card">
+                <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
+                <p id="day-master-desc">대화창에 생년월일을 입력하면 이곳에 분석 결과가 표시됩니다.</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="active"><i class="ph ph-chat-circle-text"></i> 상담실</a>
+                <a href="#"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
+                <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+            </nav>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-interface">
+            <header class="chat-header">
+                <div class="agent-info">
+                    <div class="agent-avatar"><i class="ph ph-magic-wand"></i></div>
+                    <div>
+                        <h3>AI 사주 마스터</h3>
+                        <span class="status-indicator">운명 상담 중</span>
+                    </div>
+                </div>
+                <!-- <button class="end-session-btn" onclick="window.location.reload()">세션 종료</button> -->
+            </header>
+
+            <div class="chat-messages" id="chat-history">
+                <!-- Messages will appear here -->
+                <div class="message ai-message system-notice">
+                    <div class="bubble">
+                        <p>안녕하세요. <strong>DJ 명리</strong>입니다. 궁금한 점이 있으신가요? <br>무엇이든 물어보세요.</p>
+                        <p style="font-size: 0.85em; opacity: 0.8; margin-top: 5px;">(정확한 상담을 위해 생년월일과 태어난 시간을 말씀해 주시면 더
+                            좋습니다.)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="suggestion-chips" id="suggestion-chips">
+                    <button>💰 올해 재물운은?</button>
+                    <button>💘 연애/결혼운 보기</button>
+                    <button>💼 직장/진로 고민</button>
+                </div>
+                <div class="input-wrapper">
+                    <button class="attach-btn"><i class="ph ph-plus-circle"></i></button>
+                    <input type="text" id="user-input" placeholder="메시지를 입력하세요..." autocomplete="off">
+                    <button class="send-btn" id="send-btn"><i class="ph ph-paper-plane-right"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="manseryeok.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment variables (API Key)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
