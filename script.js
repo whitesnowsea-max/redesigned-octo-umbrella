@@ -3,7 +3,8 @@ const PROXY_API_URL = "/api/chat";
 
 let state = {
     chatHistory: [],
-    currentSaju: null // 현재 사용자의 사주 정보
+    currentSaju: null, // 현재 사용자의 사주 정보
+    queryList: [] // 조회한 사주 목록
 };
 
 // 만세력 데이터 미리 로드
@@ -362,6 +363,9 @@ async function calculateAndDisplaySaju(birthInfo) {
             console.error('localStorage 저장 실패:', e);
         }
 
+        // 조회 목록에 추가
+        addToQueryList(chartData);
+
         return chartData;
     } catch (err) {
         console.error('사주 계산 오류:', err);
@@ -666,6 +670,118 @@ function restoreState() {
             console.error('채팅 메시지 복원 실패:', e);
         }
     }
+
+    // 4. 조회 목록 복원
+    const queryStr = localStorage.getItem('queryList');
+    if (queryStr) {
+        try {
+            state.queryList = JSON.parse(queryStr);
+            renderQueryList();
+        } catch (e) {
+            console.error('조회 목록 복원 실패:', e);
+        }
+    }
+}
+
+// ===== 조회 목록 관리 =====
+
+function addToQueryList(chartData) {
+    if (!chartData || !chartData.userProfile) return;
+
+    const birth = chartData.userProfile.birth;
+    const gender = chartData.userProfile.gender || '미상';
+
+    // 중복 체크 (같은 생년월일시 + 성별)
+    const key = `${birth}_${gender}`;
+    const exists = state.queryList.find(q => `${q.birth}_${q.gender}` === key);
+    if (exists) {
+        // 이미 있으면 활성만 변경
+        state.queryList.forEach(q => q.active = false);
+        exists.active = true;
+        exists.chartData = chartData; // 최신 데이터로 업데이트
+    } else {
+        // 기존 항목 비활성화
+        state.queryList.forEach(q => q.active = false);
+        // 새 항목 추가
+        state.queryList.push({
+            name: chartData.userProfile.name || '방문자',
+            birth: birth,
+            gender: gender,
+            chartData: chartData,
+            active: true,
+            timestamp: Date.now()
+        });
+    }
+
+    // localStorage 저장
+    try {
+        localStorage.setItem('queryList', JSON.stringify(state.queryList));
+    } catch (e) {
+        console.error('조회 목록 저장 실패:', e);
+    }
+
+    renderQueryList();
+}
+
+function renderQueryList() {
+    const section = document.getElementById('query-history-section');
+    const list = document.getElementById('query-list');
+    if (!section || !list) return;
+
+    if (state.queryList.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    list.innerHTML = '';
+
+    state.queryList.forEach((q, idx) => {
+        const item = document.createElement('div');
+        item.className = `query-item ${q.active ? 'active' : ''}`;
+        item.onclick = () => switchToQuery(idx);
+
+        const genderIcon = q.gender === '여성' ? '♀' : q.gender === '남성' ? '♂' : '?';
+        const shortBirth = q.birth.replace(/\s*\(.*\)/, ''); // "1981-03-15 (9시)" → "1981-03-15"
+
+        item.innerHTML = `
+            <div class="qi-avatar">${genderIcon}</div>
+            <div class="qi-info">
+                <div class="qi-birth">${shortBirth}</div>
+                <div class="qi-gender">${q.gender} · ${q.name}</div>
+            </div>
+        `;
+
+        list.appendChild(item);
+    });
+}
+
+function switchToQuery(index) {
+    if (index < 0 || index >= state.queryList.length) return;
+
+    // 모든 항목 비활성화 후 선택된 항목만 활성화
+    state.queryList.forEach(q => q.active = false);
+    state.queryList[index].active = true;
+
+    const q = state.queryList[index];
+    const chartData = q.chartData;
+
+    // 사이드바 업데이트
+    updateSidebar(chartData);
+    state.currentSaju = chartData;
+    if (chartData.daeun) {
+        state.currentDaeun = chartData.daeun;
+    }
+
+    // 대운 페이지용 localStorage 업데이트
+    try {
+        localStorage.setItem('sajuData', JSON.stringify(chartData));
+        localStorage.setItem('queryList', JSON.stringify(state.queryList));
+    } catch (e) {
+        console.error('localStorage 저장 실패:', e);
+    }
+
+    renderQueryList();
 }
 
 function addLoadingMessage() {
