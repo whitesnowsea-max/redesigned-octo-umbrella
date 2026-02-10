@@ -353,6 +353,13 @@ async function calculateAndDisplaySaju(birthInfo) {
 
         updateSidebar(chartData);
 
+        // 대운 페이지에서 사용할 수 있도록 localStorage에 저장
+        try {
+            localStorage.setItem('sajuData', JSON.stringify(chartData));
+        } catch (e) {
+            console.error('localStorage 저장 실패:', e);
+        }
+
         return chartData;
     } catch (err) {
         console.error('사주 계산 오류:', err);

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대운·세운 흐름 - DJ 명리</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* ===== 대운 페이지 전용 스타일 ===== */
+        .daeun-page {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .daeun-content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .daeun-content h1 {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .daeun-content .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .no-data-msg a {
+            color: #a78bfa;
+            text-decoration: underline;
+        }
+
+        /* --- 대운 요약 카드 --- */
+        .daeun-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .summary-card .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .summary-card .value {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .summary-card.current {
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.15);
+        }
+
+        /* --- 대운 타임라인 차트 --- */
+        .section-heading {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.15rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .daeun-timeline {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .daeun-block {
+            flex: 0 0 auto;
+            width: 90px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .daeun-block:hover {
+            transform: translateY(-3px);
+        }
+
+        .daeun-block .ganji-box {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 0.4rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: all 0.3s;
+        }
+
+        .daeun-block.current .ganji-box {
+            border-color: #a78bfa;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(96, 165, 250, 0.15));
+        }
+
+        .daeun-block .korean {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .daeun-block .age-range {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 0.15rem;
+        }
+
+        .daeun-block .year-range {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .daeun-connector {
+            position: absolute;
+            top: 30px;
+            right: -15px;
+            width: 30px;
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        .daeun-block:last-child .daeun-connector {
+            display: none;
+        }
+
+        /* --- 오행 에너지 바 차트 --- */
+        .energy-chart {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .energy-bar-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .energy-label {
+            width: 70px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .energy-bar-bg {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .energy-bar {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .energy-bar.wood {
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+        }
+
+        .energy-bar.fire {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .energy-bar.earth {
+            background: linear-gradient(90deg, #eab308, #facc15);
+        }
+
+        .energy-bar.metal {
+            background: linear-gradient(90deg, #a1a1aa, #d4d4d8);
+        }
+
+        .energy-bar.water {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
+
+        /* --- 세운 테이블 --- */
+        .seun-table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        .seun-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .seun-table thead th {
+            background: var(--bg-secondary);
+            padding: 0.6rem 0.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .seun-table tbody td {
+            padding: 0.5rem 0.4rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .seun-table tbody tr:hover {
+            background: rgba(167, 139, 250, 0.05);
+        }
+
+        .seun-table tbody tr.current-year {
+            background: rgba(167, 139, 250, 0.12);
+            font-weight: 600;
+        }
+
+        .seun-table tbody tr.current-year td:first-child::after {
+            content: ' ◀';
+            color: #a78bfa;
+            font-size: 0.7rem;
+        }
+
+        .seun-table .daeun-group-header {
+            background: rgba(96, 165, 250, 0.08);
+            font-weight: 700;
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        .seun-table .daeun-group-header td {
+            padding: 0.7rem 0.5rem;
+            border-bottom: 2px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .element-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 3px;
+            vertical-align: middle;
+        }
+
+        .element-dot.Wood {
+            background: #22c55e;
+        }
+
+        .element-dot.Fire {
+            background: #ef4444;
+        }
+
+        .element-dot.Earth {
+            background: #eab308;
+        }
+
+        .element-dot.Metal {
+            background: #a1a1aa;
+        }
+
+        .element-dot.Water {
+            background: #3b82f6;
+        }
+
+        /* --- 대운 해설 카드 --- */
+        .daeun-analysis-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .daeun-analysis-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            transition: border-color 0.3s;
+        }
+
+        .daeun-analysis-card.current {
+            border-color: #a78bfa;
+        }
+
+        .daeun-analysis-card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .daeun-analysis-card .card-ganji {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .daeun-analysis-card .card-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .daeun-analysis-card .card-elements {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .element-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .daeun-analysis-card .card-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* --- 반응형 --- */
+        @media (max-width: 768px) {
+            .daeun-content {
+                padding: 1rem 1rem;
+            }
+
+            .daeun-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .daeun-analysis-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="daeun-page">
+        <!-- Sidebar (같은 구조) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="ph ph-sparkle"></i>
+                    <span>AI 명리</span>
+                </div>
+            </div>
+
+            <div class="section-title">내 사주 명식 (만세력)</div>
+
+            <div class="user-mini-profile" id="user-profile-display" style="display:none; margin-bottom: 1rem;">
+                <div class="avatar" id="sidebar-avatar">?</div>
+                <div class="user-info">
+                    <h3 id="display-name">방문자</h3>
+                    <span id="display-birth">생년월일 정보 없음</span>
+                </div>
+            </div>
+
+            <div class="saju-grid">
+                <div class="grid-header">시주</div>
+                <div class="grid-header">일주</div>
+                <div class="grid-header">월주</div>
+                <div class="grid-header">년주</div>
+                <div class="pillar-box" id="hour-stem">?</div>
+                <div class="pillar-box day-master" id="day-stem">?</div>
+                <div class="pillar-box" id="month-stem">?</div>
+                <div class="pillar-box" id="year-stem">?</div>
+                <div class="pillar-box" id="hour-branch">?</div>
+                <div class="pillar-box" id="day-branch">?</div>
+                <div class="pillar-box" id="month-branch">?</div>
+                <div class="pillar-box" id="year-branch">?</div>
+            </div>
+
+            <div class="analysis-card">
+                <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
+                <p id="day-master-desc">대화창에서 사주를 먼저 뽑아주세요.</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html"><i class="ph ph-chat-circle-text"></i> 상담실</a>
+                <a href="daeun.html" class="active"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
+                <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="daeun-content" id="daeun-content">
+            <div class="no-data-msg" id="no-data-msg">
+                <p>📊 대운·세운 흐름을 보려면</p>
+                <p><a href="index.html">상담실</a>에서 먼저 생년월일시를 입력해 주세요.</p>
+            </div>
+            <div id="daeun-loaded" style="display:none;">
+                <!-- JS가 동적으로 채움 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="manseryeok.js"></script>
+    <script>
+        // ===== 대운 흐름 페이지 스크립트 =====
+
+        const STEMS_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const BRANCHES_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const SIXTY_GANJI = [];
+        for (let i = 0; i < 60; i++) SIXTY_GANJI.push(STEMS_ORDER[i % 10] + BRANCHES_ORDER[i % 12]);
+
+        function getElementColor(element) {
+            const map = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#a1a1aa', Water: '#3b82f6' };
+            return map[element] || '#666';
+        }
+        function getElementKorean(element) {
+            const map = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
+            return map[element] || element;
+        }
+        function getElementShort(element) {
+            const map = { Wood: '木', Fire: '火', Earth: '土', Metal: '金', Water: '水' };
+            return map[element] || '';
+        }
+
+        // 세운 간지 계산 (연도 → 60갑자)
+        function getYearGanji(year) {
+            // 1984년 = 甲子 (index 0)
+            const idx = ((year - 1984) % 60 + 60) % 60;
+            return SIXTY_GANJI[idx];
+        }
+
+        // 대운이 일간에게 어떤 의미인지 간단 해설
+        function getDaeunRelation(dayMasterElement, daeunStemElement, daeunBranchElement) {
+            const relations = [];
+            const check = (el) => {
+                if (el === dayMasterElement) return '비겁(比劫)';
+                const cycle = { Wood: 'Fire', Fire: 'Earth', Earth: 'Metal', Metal: 'Water', Water: 'Wood' };
+                const ctrl = { Wood: 'Earth', Earth: 'Water', Water: 'Fire', Fire: 'Metal', Metal: 'Wood' };
+                if (cycle[dayMasterElement] === el) return '식상(食傷)';
+                if (cycle[el] === dayMasterElement) return '인성(印星)';
+                if (ctrl[dayMasterElement] === el) return '재성(財星)';
+                if (ctrl[el] === dayMasterElement) return '관성(官星)';
+                return '';
+            };
+            const stemRel = check(daeunStemElement);
+            const branchRel = check(daeunBranchElement);
+            return { stemRel, branchRel };
+        }
+
+        async function initPage() {
+            const stored = localStorage.getItem('sajuData');
+            if (!stored) return;
+
+            let sajuData;
+            try {
+                sajuData = JSON.parse(stored);
+            } catch (e) {
+                return;
+            }
+
+            if (!sajuData || !sajuData.daeun || !sajuData.chart) return;
+
+            document.getElementById('no-data-msg').style.display = 'none';
+            document.getElementById('daeun-loaded').style.display = 'block';
+
+            const { chart, daeun, userProfile } = sajuData;
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const birthYear = parseInt(userProfile.birth.split('-')[0]);
+            const currentAge = currentYear - birthYear;
+
+            // 사이드바 업데이트
+            updateSidebar(chart);
+            if (userProfile) {
+                document.getElementById('display-name').textContent = userProfile.name || '방문자';
+                document.getElementById('display-birth').textContent = userProfile.birth || '';
+                document.getElementById('user-profile-display').style.display = 'flex';
+            }
+
+            // 일간 분석
+            const dayMaster = Manseryeok.HEAVENLY_STEMS[chart.day.stem];
+            if (dayMaster) {
+                document.getElementById('day-master-desc').textContent =
+                    `일간 ${dayMaster.korean}(${chart.day.stem}) - ${getElementKorean(dayMaster.element)}, ${dayMaster.yinyang}의 기운`;
+            }
+
+            const dayMasterElement = dayMaster ? dayMaster.element : 'Wood';
+            const currentDaeun = daeun.daeunList.find(d => currentAge >= d.ageStart && currentAge <= d.ageEnd);
+
+            const container = document.getElementById('daeun-loaded');
+
+            // ========== 1. 요약카드 ==========
+            let html = `<h1>📊 대운·세운 흐름 분석</h1>`;
+            html += `<p class="subtitle">${userProfile.name || '방문자'}님 (${userProfile.birth}) · ${daeun.direction} · 대운 시작 ${daeun.startAge}세</p>`;
+
+            html += `<div class="daeun-summary">`;
+            html += `<div class="summary-card"><div class="label">현재 나이</div><div class="value">${currentAge}세</div></div>`;
+            html += `<div class="summary-card"><div class="label">대운 방향</div><div class="value">${daeun.direction}</div></div>`;
+            if (currentDaeun) {
+                html += `<div class="summary-card current"><div class="label">현재 대운</div><div class="value" style="color:${getElementColor(currentDaeun.stemElement)}">${currentDaeun.ganji}(${currentDaeun.ganjiKorean})</div></div>`;
+                html += `<div class="summary-card"><div class="label">대운 기간</div><div class="value" style="font-size:1rem">${currentDaeun.ageStart}~${currentDaeun.ageEnd}세</div></div>`;
+            }
+            html += `</div>`;
+
+            // ========== 2. 대운 타임라인 ==========
+            html += `<h2 class="section-heading">🔮 대운 타임라인</h2>`;
+            html += `<div class="daeun-timeline">`;
+            daeun.daeunList.forEach(d => {
+                const isCurrent = currentAge >= d.ageStart && currentAge <= d.ageEnd;
+                html += `<div class="daeun-block ${isCurrent ? 'current' : ''}">`;
+                html += `<div class="ganji-box" style="color:${getElementColor(d.stemElement)}">${d.ganji}</div>`;
+                html += `<div class="korean">${d.ganjiKorean}</div>`;
+                html += `<div class="age-range">${d.ageStart}~${d.ageEnd}세</div>`;
+                html += `<div class="year-range">${d.yearStart}~${d.yearEnd}</div>`;
+                if (!isCurrent) html += `<div class="daeun-connector"></div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+
+            // ========== 3. 오행 에너지 분포 (대운별) ==========
+            html += `<h2 class="section-heading">🌊 대운별 오행 에너지</h2>`;
+            html += `<div class="energy-chart">`;
+            const elementCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+            daeun.daeunList.forEach(d => {
+                elementCounts[d.stemElement]++;
+                elementCounts[d.branchElement]++;
+            });
+            const total = daeun.daeunList.length * 2;
+            ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].forEach(el => {
+                const pct = Math.round((elementCounts[el] / total) * 100);
+                html += `<div class="energy-bar-container">`;
+                html += `<div class="energy-label">${getElementKorean(el)}</div>`;
+                html += `<div class="energy-bar-bg"><div class="energy-bar ${el.toLowerCase()}" style="width:${Math.max(pct, 5)}%">${pct}%</div></div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+
+            // ========== 4. 대운 해설 카드 ==========
+            html += `<h2 class="section-heading">📖 대운별 간략 해설</h2>`;
+            html += `<div class="daeun-analysis-cards">`;
+            daeun.daeunList.forEach(d => {
+                const isCurrent = currentAge >= d.ageStart && currentAge <= d.ageEnd;
+                const rel = getDaeunRelation(dayMasterElement, d.stemElement, d.branchElement);
+                html += `<div class="daeun-analysis-card ${isCurrent ? 'current' : ''}">`;
+                html += `<div class="card-header">`;
+                html += `<span class="card-ganji" style="color:${getElementColor(d.stemElement)}">${d.ganji}</span>`;
+                html += `<span class="card-meta">${d.ganjiKorean} · ${d.ageStart}~${d.ageEnd}세 (${d.yearStart}~${d.yearEnd})${isCurrent ? ' 🟢 현재' : ''}</span>`;
+                html += `</div>`;
+                html += `<div class="card-elements">`;
+                html += `<span class="element-tag"><span class="element-dot ${d.stemElement}"></span>${getElementKorean(d.stemElement)} (천간) → ${rel.stemRel}</span>`;
+                html += `<span class="element-tag"><span class="element-dot ${d.branchElement}"></span>${getElementKorean(d.branchElement)} (지지) → ${rel.branchRel}</span>`;
+                html += `</div>`;
+                html += `<div class="card-desc">${getDaeunDescription(dayMasterElement, d, rel)}</div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+
+            // ========== 5. 세운 상세 테이블 (1세~100세) ==========
+            html += `<h2 class="section-heading">📅 세운 상세 (1세~100세)</h2>`;
+            html += `<div class="seun-table-wrapper"><table class="seun-table">`;
+            html += `<thead><tr><th>나이</th><th>연도</th><th>세운</th><th>천간</th><th>지지</th><th>대운</th><th>비고</th></tr></thead>`;
+            html += `<tbody>`;
+
+            let lastDaeunGanji = '';
+            for (let age = 1; age <= 100; age++) {
+                const yr = birthYear + age;
+                const yearGanji = getYearGanji(yr);
+                const stem = yearGanji[0];
+                const branch = yearGanji[1];
+                const stemInfo = Manseryeok.HEAVENLY_STEMS[stem];
+                const branchInfo = Manseryeok.EARTHLY_BRANCHES[branch];
+                const stemK = stemInfo ? stemInfo.korean : '';
+                const branchK = branchInfo ? branchInfo.korean : '';
+                const stemEl = stemInfo ? stemInfo.element : '';
+                const branchEl = branchInfo ? branchInfo.element : '';
+
+                // 해당 나이의 대운 찾기
+                const d = daeun.daeunList.find(dd => age >= dd.ageStart && age <= dd.ageEnd);
+                const daeunStr = d ? `${d.ganji}(${d.ganjiKorean})` : '-';
+
+                // 대운 그룹 헤더
+                if (d && d.ganji !== lastDaeunGanji) {
+                    html += `<tr class="daeun-group-header"><td colspan="7">🔮 대운: ${d.ganji}(${d.ganjiKorean}) — ${d.ageStart}~${d.ageEnd}세 (${d.yearStart}~${d.yearEnd}년)</td></tr>`;
+                    lastDaeunGanji = d.ganji;
+                }
+
+                const isCurrentYear = yr === currentYear;
+                const note = isCurrentYear ? '현재' : '';
+
+                html += `<tr class="${isCurrentYear ? 'current-year' : ''}">`;
+                html += `<td>${age}세</td>`;
+                html += `<td>${yr}년</td>`;
+                html += `<td style="font-family:'Noto Serif KR',serif;font-weight:700;">${yearGanji}</td>`;
+                html += `<td><span class="element-dot ${stemEl}"></span>${stemK}(${getElementShort(stemEl)})</td>`;
+                html += `<td><span class="element-dot ${branchEl}"></span>${branchK}(${getElementShort(branchEl)})</td>`;
+                html += `<td style="font-size:0.7rem;">${daeunStr}</td>`;
+                html += `<td>${note}</td>`;
+                html += `</tr>`;
+            }
+            html += `</tbody></table></div>`;
+
+            container.innerHTML = html;
+        }
+
+        function getDaeunDescription(dayMasterElement, d, rel) {
+            const descriptions = {
+                '비겁(比劫)': '나와 같은 기운이 들어와 자신감과 경쟁심이 높아지는 시기입니다.',
+                '식상(食傷)': '표현력과 창의력이 꽃피는 시기로, 새로운 아이디어와 활동이 펼쳐집니다.',
+                '재성(財星)': '재물과 현실적 성과가 나타나는 시기로, 재정적 기회가 찾아옵니다.',
+                '관성(官星)': '사회적 책임과 명예가 강화되는 시기로, 직장·승진·시험운이 작용합니다.',
+                '인성(印星)': '학문과 지혜가 깊어지는 시기로, 배움과 보호의 기운이 작용합니다.'
+            };
+            const stemDesc = descriptions[rel.stemRel] || '';
+            return `천간 ${getElementKorean(d.stemElement)}(${rel.stemRel})의 영향: ${stemDesc}`;
+        }
+
+        // 사이드바 사주 표시
+        function updateSidebar(chart) {
+            const elementColorMap = {
+                Wood: 'var(--element-wood, #22c55e)',
+                Fire: 'var(--element-fire, #ef4444)',
+                Earth: 'var(--element-earth, #eab308)',
+                Metal: 'var(--element-metal, #a1a1aa)',
+                Water: 'var(--element-water, #3b82f6)'
+            };
+            function setPillar(type, info) {
+                const stemEl = document.getElementById(`${type}-stem`);
+                const branchEl = document.getElementById(`${type}-branch`);
+                if (stemEl && info.stem) {
+                    stemEl.textContent = info.stem;
+                    stemEl.style.color = elementColorMap[info.stemElement] || '';
+                }
+                if (branchEl && info.branch) {
+                    branchEl.textContent = info.branch;
+                    branchEl.style.color = elementColorMap[info.branchElement] || '';
+                }
+            }
+            if (chart.year) setPillar('year', chart.year);
+            if (chart.month) setPillar('month', chart.month);
+            if (chart.day) setPillar('day', chart.day);
+            if (chart.hour) setPillar('hour', chart.hour);
+        }
+
+        initPage();
+    </script>
+</body>
+
+</html>
