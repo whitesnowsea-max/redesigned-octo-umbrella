@@ -107,13 +107,16 @@ Format:
 **## 2. 쥐고 있는 패 (사주 원국 분석)**
 타고난 8글자(원국)의 특징과 강점을 분석합니다.
 
-**## 3. 올해의 카드 (세운 분석)**
+**## 3. 현재의 흐름 (대운 분석)**
+제공된 대운 데이터를 기반으로 현재 대운의 간지와 오행을 분석하고, 일간과의 관계를 해석합니다. 대운은 이미 정확하게 계산되어 제공되므로 절대 직접 계산하지 마세요.
+
+**## 4. 올해의 카드 (세운 분석)**
 해당 연도(세운)의 운세와 분위기를 분석합니다.
 
-**## 4. DJ 명리의 운명 믹싱 전략 (Solution)**
+**## 5. DJ 명리의 운명 믹싱 전략 (Solution)**
 위 분석을 종합하여, 사용자가 취해야 할 구체적인 행동 전략과 조언을 제시합니다.
 
-**## 5. DJ 명리의 한 줄 요약**
+**## 6. DJ 명리의 한 줄 요약**
 전체 내용을 관통하는 핵심 메시지를 한 문장으로 요약합니다.
 
 ---
@@ -295,6 +298,15 @@ async function calculateAndDisplaySaju(birthInfo) {
 
         state.currentSaju = saju;
 
+        // 대운 계산
+        let daeunResult = null;
+        if (birthInfo.gender && (birthInfo.gender === '남성' || birthInfo.gender === '여성')) {
+            daeunResult = await window.Manseryeok.calculateDaeun(
+                birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, birthInfo.gender
+            );
+            state.currentDaeun = daeunResult;
+        }
+
         // 사이드바 업데이트
         const chartData = {
             userProfile: {
@@ -332,7 +344,8 @@ async function calculateAndDisplaySaju(birthInfo) {
                     ganji: saju.hour.hanja
                 }
             },
-            dayMasterAnalysis: `일간 ${saju.dayMaster.korean}(${saju.dayMaster.stem}) - ${window.Manseryeok.getElementKorean(saju.dayMaster.element)}, ${saju.dayMaster.yinyang}의 기운`
+            dayMasterAnalysis: `일간 ${saju.dayMaster.korean}(${saju.dayMaster.stem}) - ${window.Manseryeok.getElementKorean(saju.dayMaster.element)}, ${saju.dayMaster.yinyang}의 기운`,
+            daeun: daeunResult
         };
 
         updateSidebar(chartData);
@@ -393,8 +406,20 @@ async function callGemini(userText, sajuContext = null) {
         const birthYear = parseInt(sajuContext.userProfile.birth.split('-')[0]);
         const age = currentYear - birthYear;
 
-        // 대운 주기 계산 (대략 10년 단위, 시작 나이는 성별에 따라 다름)
-        const daeunCycle = Math.floor(age / 10) + 1;
+        // 대운 정보 문자열 생성
+        let daeunInfo = '';
+        if (sajuContext.daeun && sajuContext.daeun.daeunList) {
+            const daeun = sajuContext.daeun;
+            const currentDaeun = window.Manseryeok.getCurrentDaeun(daeun, age);
+
+            daeunInfo = `\n[대운 정보 (만세력 기반 정확 계산)]
+- 대운 방향: ${daeun.direction}
+- 대운 시작 나이: ${daeun.startAge}세
+- 월주: ${daeun.monthPillar}
+- 현재 대운: ${currentDaeun ? `${currentDaeun.ganji}(${currentDaeun.ganjiKorean}) [${currentDaeun.ageStart}세~${currentDaeun.ageEnd}세, ${currentDaeun.yearStart}~${currentDaeun.yearEnd}년]` : '대운 전 (아직 첫 대운 진입 전)'}
+- 전체 대운 흐름:
+${daeun.daeunList.map(d => `  ${d.ageStart}~${d.ageEnd}세 (${d.yearStart}~${d.yearEnd}년): ${d.ganji}(${d.ganjiKorean}) [${window.Manseryeok.getElementKorean(d.stemElement)}/${window.Manseryeok.getElementKorean(d.branchElement)}]${age >= d.ageStart && age <= d.ageEnd ? ' ◀ 현재' : ''}`).join('\n')}`;
+        }
 
         const sajuInfo = `
 [만세력 기반 정확한 사주 데이터]
@@ -406,15 +431,15 @@ async function callGemini(userText, sajuContext = null) {
 - 일주: ${sajuContext.chart.day.ganji}
 - 시주: ${sajuContext.chart.hour.ganji}
 - 일간 분석: ${sajuContext.dayMasterAnalysis}
+${daeunInfo}
 
-[현재 시간 정보 - 대운/세운 분석용]
+[현재 시간 정보 - 세운 분석용]
 - 오늘 날짜: ${currentYear}년 ${currentMonth}월 ${currentDay}일
 - 현재 연도(세운): ${currentYear}년
 - 만 나이: ${age}세
-- 현재 대운 주기: 약 ${daeunCycle}번째 대운 (${(daeunCycle - 1) * 10}~${daeunCycle * 10}세 구간)
 
-위 만세력 데이터와 현재 시간 정보를 기반으로 사주 풀이를 해주세요.
-- 대운 분석 시 현재 나이(${age}세) 기준으로 분석해 주세요.
+위 만세력 데이터와 대운/세운 정보를 기반으로 사주 풀이를 해주세요.
+- 대운 분석 시 위에 제공된 정확한 대운 간지와 현재 나이(${age}세) 기준으로 분석해 주세요.
 - 세운 분석 시 ${currentYear}년을 기준으로 분석해 주세요.
 AI가 자체 계산하지 말고 위 데이터를 사용하세요.
 

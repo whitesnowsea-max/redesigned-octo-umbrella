@@ -1,0 +1,10 @@
+name = "saju-app"
+type = "javascript"
+account_id = "e57ba0a982f96ad9b1e1998baae208ed"
+workers_dev = false
+route = ""
+zone_id = ""
+
+[site]
+bucket = "./"
+entry-point = ""

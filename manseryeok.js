@@ -258,12 +258,181 @@ function getElementKorean(element) {
     return map[element] || element;
 }
 
+// ========== 대운 계산 ==========
+
+// 천간, 지지 순서 배열
+const STEMS_ORDER = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+const BRANCHES_ORDER = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+// 60갑자 배열 생성
+const SIXTY_GANJI = [];
+for (let i = 0; i < 60; i++) {
+    SIXTY_GANJI.push(STEMS_ORDER[i % 10] + BRANCHES_ORDER[i % 12]);
+}
+
+/**
+ * 만세력 데이터에서 월주가 바뀌는 날짜(절기)를 찾는다.
+ * 순행(forward=true): 생일 이후 가장 가까운 월 절입일
+ * 역행(forward=false): 생일 이전 가장 가까운 월 절입일
+ */
+function findJeolgiDate(year, month, day, forward) {
+    const birthDate = new Date(year, month - 1, day);
+    const birthKey = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+    const birthRecord = manseryeokData[birthKey];
+    if (!birthRecord) return null;
+
+    const birthMonthPillar = birthRecord.m;
+
+    if (forward) {
+        // 순행: 생일 다음 날부터 탐색하여 월주가 바뀌는 날을 찾음
+        let searchDate = new Date(birthDate);
+        for (let i = 1; i <= 45; i++) { // 최대 45일 탐색
+            searchDate.setDate(searchDate.getDate() + 1);
+            const y = searchDate.getFullYear();
+            const m = searchDate.getMonth() + 1;
+            const d = searchDate.getDate();
+            const key = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+            const rec = manseryeokData[key];
+            if (rec && rec.m !== birthMonthPillar) {
+                return searchDate;
+            }
+        }
+    } else {
+        // 역행: 생일 당일부터 과거로 탐색하여 월주가 바뀌는 날을 찾음
+        let searchDate = new Date(birthDate);
+        for (let i = 0; i <= 45; i++) { // 최대 45일 탐색
+            const y = searchDate.getFullYear();
+            const m = searchDate.getMonth() + 1;
+            const d = searchDate.getDate();
+            const key = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+            const rec = manseryeokData[key];
+            if (rec && rec.m !== birthMonthPillar) {
+                // 절기일은 새 월주가 시작되는 다음 날
+                const jeolgiDate = new Date(searchDate);
+                jeolgiDate.setDate(jeolgiDate.getDate() + 1);
+                return jeolgiDate;
+            }
+            searchDate.setDate(searchDate.getDate() - 1);
+        }
+    }
+    return null;
+}
+
+/**
+ * 대운 계산
+ * @param {number} year - 양력 연도
+ * @param {number} month - 양력 월 (1-12)
+ * @param {number} day - 양력 일 (1-31)
+ * @param {number} hour - 시간 (0-23)
+ * @param {string} gender - '남성' 또는 '여성'
+ * @returns {Object} 대운 정보
+ */
+async function calculateDaeun(year, month, day, hour, gender) {
+    await loadManseryeokData();
+
+    // 자시 환국 적용
+    let adjustedYear = year, adjustedMonth = month, adjustedDay = day;
+    if (hour >= 23) {
+        const nextDate = new Date(year, month - 1, day + 1);
+        adjustedYear = nextDate.getFullYear();
+        adjustedMonth = nextDate.getMonth() + 1;
+        adjustedDay = nextDate.getDate();
+    }
+
+    const dateKey = `${adjustedYear}${String(adjustedMonth).padStart(2, '0')}${String(adjustedDay).padStart(2, '0')}`;
+    const record = manseryeokData[dateKey];
+    if (!record) return null;
+
+    const yearStem = record.y[0]; // 년주 천간
+    const monthGanji = record.m;  // 월주 간지
+
+    // 1. 순행/역행 결정
+    const yearStemYinYang = HEAVENLY_STEMS[yearStem].yinyang;
+    const isMale = gender === '남성' || gender === '남';
+    
+    // 양남음녀 → 순행, 음남양녀 → 역행
+    let isForward;
+    if (isMale) {
+        isForward = yearStemYinYang === '양'; // 양남 순행, 음남 역행
+    } else {
+        isForward = yearStemYinYang === '음'; // 음녀 순행, 양녀 역행
+    }
+
+    // 2. 대운 시작 나이 계산
+    const jeolgiDate = findJeolgiDate(adjustedYear, adjustedMonth, adjustedDay, isForward);
+    let startAge = 1; // 기본값
+    if (jeolgiDate) {
+        const birthDate = new Date(adjustedYear, adjustedMonth - 1, adjustedDay);
+        const diffDays = Math.abs(Math.round((jeolgiDate - birthDate) / (1000 * 60 * 60 * 24)));
+        startAge = Math.round(diffDays / 3);
+        if (startAge < 1) startAge = 1;
+        if (startAge > 10) startAge = 10;
+    }
+
+    // 3. 월주에서 60갑자 인덱스 찾기
+    const monthGanjiIndex = SIXTY_GANJI.indexOf(monthGanji);
+
+    // 4. 대운 간지 12개 생성
+    const daeunList = [];
+    for (let i = 1; i <= 12; i++) {
+        let idx;
+        if (isForward) {
+            idx = (monthGanjiIndex + i) % 60;
+        } else {
+            idx = (monthGanjiIndex - i + 60) % 60;
+        }
+        const ganji = SIXTY_GANJI[idx];
+        const stem = ganji[0];
+        const branch = ganji[1];
+        const ageStart = startAge + (i - 1) * 10;
+        const ageEnd = ageStart + 9;
+
+        daeunList.push({
+            index: i,
+            ganji: ganji,
+            ganjiKorean: HEAVENLY_STEMS[stem].korean + EARTHLY_BRANCHES[branch].korean,
+            stem: stem,
+            branch: branch,
+            stemElement: HEAVENLY_STEMS[stem].element,
+            branchElement: EARTHLY_BRANCHES[branch].element,
+            stemYinYang: HEAVENLY_STEMS[stem].yinyang,
+            ageStart: ageStart,
+            ageEnd: ageEnd,
+            yearStart: year + ageStart,
+            yearEnd: year + ageEnd
+        });
+    }
+
+    return {
+        direction: isForward ? '순행' : '역행',
+        startAge: startAge,
+        monthPillar: monthGanji,
+        daeunList: daeunList
+    };
+}
+
+/**
+ * 현재 대운 찾기
+ */
+function getCurrentDaeun(daeunResult, currentAge) {
+    if (!daeunResult || !daeunResult.daeunList) return null;
+    for (const daeun of daeunResult.daeunList) {
+        if (currentAge >= daeun.ageStart && currentAge <= daeun.ageEnd) {
+            return daeun;
+        }
+    }
+    return null;
+}
+
 // 전역으로 내보내기
 window.Manseryeok = {
     load: loadManseryeokData,
     calculate: calculateSaju,
+    calculateDaeun: calculateDaeun,
+    getCurrentDaeun: getCurrentDaeun,
     getChartForAI: getSajuChartForAI,
     getElementKorean: getElementKorean,
     HEAVENLY_STEMS,
-    EARTHLY_BRANCHES
+    EARTHLY_BRANCHES,
+    SIXTY_GANJI
 };
