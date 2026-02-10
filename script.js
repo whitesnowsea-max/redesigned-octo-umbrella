@@ -15,6 +15,8 @@ window.addEventListener('DOMContentLoaded', () => {
             console.warn('만세력 데이터 로드 실패:', err);
         });
     }
+    // 페이지 로드 시 저장된 상태 복원
+    restoreState();
 });
 
 // Map Element String to CSS Class
@@ -472,6 +474,7 @@ AI가 자체 계산하지 말고 위 데이터를 사용하세요.
         // Save history
         state.chatHistory.push({ role: "user", parts: [{ text: userText }] });
         state.chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+        saveChatHistory();
 
         // Detect and remove JSON (multiple patterns)
         let displayText = aiText;
@@ -584,6 +587,85 @@ function addMessage(role, text) {
     msgDiv.appendChild(bubble);
     chatContainer.appendChild(msgDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // 채팅 메시지를 localStorage에 저장 (페이지 이동 후 복원용)
+    saveChatMessages();
+}
+
+function saveChatMessages() {
+    try {
+        const messages = [];
+        chatContainer.querySelectorAll('.message').forEach(msg => {
+            if (msg.classList.contains('system-notice')) return; // 초기 인사 건너뛰기
+            const role = msg.classList.contains('user-message') ? 'user' : 'ai';
+            const bubble = msg.querySelector('.bubble');
+            if (bubble) {
+                messages.push({ role, html: bubble.innerHTML });
+            }
+        });
+        localStorage.setItem('chatMessages', JSON.stringify(messages));
+    } catch (e) {
+        console.error('채팅 저장 실패:', e);
+    }
+}
+
+function saveChatHistory() {
+    try {
+        localStorage.setItem('chatHistoryState', JSON.stringify(state.chatHistory));
+    } catch (e) {
+        console.error('chatHistory 저장 실패:', e);
+    }
+}
+
+function restoreState() {
+    // 1. 사주 명식 복원
+    const sajuStr = localStorage.getItem('sajuData');
+    if (sajuStr) {
+        try {
+            const sajuData = JSON.parse(sajuStr);
+            if (sajuData && sajuData.chart) {
+                updateSidebar(sajuData);
+                state.currentSaju = sajuData;
+                if (sajuData.daeun) {
+                    state.currentDaeun = sajuData.daeun;
+                }
+            }
+        } catch (e) {
+            console.error('사주 복원 실패:', e);
+        }
+    }
+
+    // 2. 대화 내역 (chatHistory) 복원
+    const historyStr = localStorage.getItem('chatHistoryState');
+    if (historyStr) {
+        try {
+            state.chatHistory = JSON.parse(historyStr);
+        } catch (e) {
+            console.error('chatHistory 복원 실패:', e);
+        }
+    }
+
+    // 3. 채팅 메시지 DOM 복원
+    const messagesStr = localStorage.getItem('chatMessages');
+    if (messagesStr) {
+        try {
+            const messages = JSON.parse(messagesStr);
+            if (messages.length > 0) {
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${msg.role === 'user' ? 'user' : 'ai'}-message`;
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble markdown-body';
+                    bubble.innerHTML = msg.html;
+                    msgDiv.appendChild(bubble);
+                    chatContainer.appendChild(msgDiv);
+                });
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        } catch (e) {
+            console.error('채팅 메시지 복원 실패:', e);
+        }
+    }
 }
 
 function addLoadingMessage() {
