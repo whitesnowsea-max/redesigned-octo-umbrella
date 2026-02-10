@@ -398,6 +398,16 @@ async function sendMessage() {
 
         if (birthInfo && window.Manseryeok) {
             sajuContext = await calculateAndDisplaySaju(birthInfo);
+            // 생년월일 입력 메시지에 birth-key 태그 추가 (조회 목록 클릭 시 스크롤용)
+            if (sajuContext) {
+                const birthKey = `${sajuContext.userProfile.birth}_${sajuContext.userProfile.gender}`;
+                const lastUserMsg = chatContainer.querySelector('.user-message:last-of-type') ||
+                    [...chatContainer.querySelectorAll('.user-message')].pop();
+                if (lastUserMsg) {
+                    lastUserMsg.setAttribute('data-birth-key', birthKey);
+                    saveChatMessages();
+                }
+            }
         }
 
         await callGemini(text, sajuContext);
@@ -604,7 +614,11 @@ function saveChatMessages() {
             const role = msg.classList.contains('user-message') ? 'user' : 'ai';
             const bubble = msg.querySelector('.bubble');
             if (bubble) {
-                messages.push({ role, html: bubble.innerHTML });
+                const item = { role, html: bubble.innerHTML };
+                if (msg.getAttribute('data-birth-key')) {
+                    item.birthKey = msg.getAttribute('data-birth-key');
+                }
+                messages.push(item);
             }
         });
         localStorage.setItem('chatMessages', JSON.stringify(messages));
@@ -658,6 +672,9 @@ function restoreState() {
                 messages.forEach(msg => {
                     const msgDiv = document.createElement('div');
                     msgDiv.className = `message ${msg.role === 'user' ? 'user' : 'ai'}-message`;
+                    if (msg.birthKey) {
+                        msgDiv.setAttribute('data-birth-key', msg.birthKey);
+                    }
                     const bubble = document.createElement('div');
                     bubble.className = 'bubble markdown-body';
                     bubble.innerHTML = msg.html;
@@ -782,6 +799,17 @@ function switchToQuery(index) {
     }
 
     renderQueryList();
+
+    // 해당 생년월일 입력 메시지로 스크롤
+    const birthKey = `${q.birth}_${q.gender}`;
+    const targetMsg = chatContainer.querySelector(`[data-birth-key="${birthKey}"]`);
+    if (targetMsg) {
+        targetMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // 하이라이트 효과
+        targetMsg.style.transition = 'box-shadow 0.3s';
+        targetMsg.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.4)';
+        setTimeout(() => { targetMsg.style.boxShadow = ''; }, 2000);
+    }
 }
 
 function addLoadingMessage() {
