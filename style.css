@@ -362,6 +362,28 @@ body {
     color: var(--text-muted);
 }
 
+.query-item .qi-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px 5px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s, background 0.2s;
+    flex-shrink: 0;
+}
+
+.query-item:hover .qi-delete {
+    opacity: 1;
+}
+
+.query-item .qi-delete:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
 .sidebar-nav {
     margin-top: auto;
     display: flex;
@@ -452,7 +474,8 @@ body {
 .message {
     display: flex;
     gap: 1rem;
-    max-width: 50%; /* 채팅 영역의 절반 정도 차지 */
+    max-width: 50%;
+    /* 채팅 영역의 절반 정도 차지 */
     animation: fadeIn 0.3s ease;
 }
 

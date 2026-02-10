@@ -759,7 +759,7 @@ function renderQueryList() {
         item.onclick = () => switchToQuery(idx);
 
         const genderIcon = q.gender === '여성' ? '♀' : q.gender === '남성' ? '♂' : '?';
-        const shortBirth = q.birth.replace(/\s*\(.*\)/, ''); // "1981-03-15 (9시)" → "1981-03-15"
+        const shortBirth = q.birth.replace(/\s*\(.*\)/, '');
 
         item.innerHTML = `
             <div class="qi-avatar">${genderIcon}</div>
@@ -767,10 +767,71 @@ function renderQueryList() {
                 <div class="qi-birth">${shortBirth}</div>
                 <div class="qi-gender">${q.gender} · ${q.name}</div>
             </div>
+            <button class="qi-delete" title="삭제" onclick="event.stopPropagation(); deleteQuery(${idx});">×</button>
         `;
 
         list.appendChild(item);
     });
+
+    // 초기화 버튼 이벤트
+    const clearBtn = document.getElementById('clear-all-queries');
+    if (clearBtn) {
+        clearBtn.onclick = clearAllQueries;
+    }
+}
+
+function deleteQuery(index) {
+    if (index < 0 || index >= state.queryList.length) return;
+
+    const wasActive = state.queryList[index].active;
+    state.queryList.splice(index, 1);
+
+    // 삭제된 항목이 활성 상태였으면 첫 번째 항목을 활성화
+    if (wasActive && state.queryList.length > 0) {
+        state.queryList[0].active = true;
+        const chartData = state.queryList[0].chartData;
+        updateSidebar(chartData);
+        state.currentSaju = chartData;
+        localStorage.setItem('sajuData', JSON.stringify(chartData));
+    }
+
+    localStorage.setItem('queryList', JSON.stringify(state.queryList));
+    renderQueryList();
+}
+
+function clearAllQueries() {
+    if (!confirm('모든 조회 목록과 채팅 내용을 초기화하시겠습니까?')) return;
+
+    // 상태 초기화
+    state.queryList = [];
+    state.chatHistory = [];
+    state.currentSaju = null;
+    state.currentDaeun = null;
+
+    // localStorage 초기화
+    localStorage.removeItem('queryList');
+    localStorage.removeItem('chatMessages');
+    localStorage.removeItem('chatHistoryState');
+    localStorage.removeItem('sajuData');
+
+    // 채팅 영역 초기화
+    if (chatContainer) {
+        chatContainer.innerHTML = '';
+    }
+
+    // 사이드바 명식 초기화
+    ['year', 'month', 'day', 'hour'].forEach(type => {
+        const stemEl = document.getElementById(`${type}-stem`);
+        const branchEl = document.getElementById(`${type}-branch`);
+        if (stemEl) { stemEl.textContent = '-'; stemEl.style.color = ''; }
+        if (branchEl) { branchEl.textContent = '-'; branchEl.style.color = ''; }
+    });
+    const profileEl = document.getElementById('user-profile-display');
+    if (profileEl) profileEl.style.display = 'none';
+    const dayMasterEl = document.getElementById('day-master-desc');
+    if (dayMasterEl) dayMasterEl.textContent = '대화창에 생년월일을 입력하면 이곳에 분석 결과가 표시됩니다.';
+
+    renderQueryList();
 }
 
 function switchToQuery(index) {
