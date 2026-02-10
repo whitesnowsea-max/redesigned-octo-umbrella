@@ -298,13 +298,16 @@ async function calculateAndDisplaySaju(birthInfo) {
 
         state.currentSaju = saju;
 
-        // 대운 계산
+        // 대운 계산 (성별 미지정 시 기본 '남성'으로 계산)
         let daeunResult = null;
-        if (birthInfo.gender && (birthInfo.gender === '남성' || birthInfo.gender === '여성')) {
+        const genderForDaeun = birthInfo.gender || '남성';
+        try {
             daeunResult = await window.Manseryeok.calculateDaeun(
-                birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, birthInfo.gender
+                birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, genderForDaeun
             );
             state.currentDaeun = daeunResult;
+        } catch (daeunErr) {
+            console.error('대운 계산 오류:', daeunErr);
         }
 
         // 사이드바 업데이트
