@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세운 분석 - DJ 명리</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* ===== 세운 페이지 전용 스타일 ===== */
+        .seun-page {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .seun-content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .seun-content h1 {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .seun-content .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .no-data-msg a {
+            color: #a78bfa;
+            text-decoration: underline;
+        }
+
+        .section-heading {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.15rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* --- 올해 세운 요약 카드 --- */
+        .seun-hero {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .seun-hero .hero-ganji {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .seun-hero .hero-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .seun-hero .hero-year {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .seun-hero .hero-keyword {
+            font-size: 0.95rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .seun-hero .hero-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .seun-hero .hero-daeun-badge {
+            display: inline-block;
+            background: rgba(138, 43, 226, 0.15);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            margin-top: 0.5rem;
+        }
+
+        /* --- 상호작용 분석 --- */
+        .interaction-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .interaction-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .interaction-card {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .interaction-card .ic-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .interaction-card .ic-value {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .interaction-card .ic-rel {
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .interaction-card .ic-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+            line-height: 1.4;
+        }
+
+        .strategy-box {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        /* --- 월운 타임라인 --- */
+        .month-timeline {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .month-block {
+            flex: 0 0 auto;
+            width: 72px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .month-block:hover {
+            transform: translateY(-3px);
+        }
+
+        .month-block .month-ganji-box {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 0.3rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: all 0.3s;
+        }
+
+        .month-block.current .month-ganji-box {
+            border-color: #f59e0b;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08));
+        }
+
+        .month-block.selected .month-ganji-box {
+            border-color: #a78bfa;
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+
+        .month-block .month-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .month-block .month-rel {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .month-block::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: -1px;
+            width: 2px;
+            height: 0;
+            background: var(--border-color);
+        }
+
+        .month-block:last-child::after {
+            display: none;
+        }
+
+        .month-detail-panel {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            animation: panelSlide 0.3s ease;
+        }
+
+        @keyframes panelSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- 전후 5년 타임라인 --- */
+        .year-timeline {
+            display: flex;
+            gap: 0.3rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .year-block {
+            flex: 0 0 auto;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .year-block:hover {
+            transform: translateY(-3px);
+        }
+
+        .year-block .yb-ganji {
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 0.3rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: all 0.3s;
+        }
+
+        .year-block.current .yb-ganji {
+            border-color: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08));
+        }
+
+        .year-block .yb-year {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .year-block .yb-rel {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* --- 연도별 해설 카드 --- */
+        .seun-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .seun-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            transition: border-color 0.3s;
+        }
+
+        .seun-card.current {
+            border-color: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+        }
+
+        .seun-card .sc-header {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .seun-card .sc-ganji {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .seun-card .sc-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .seun-card .sc-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .seun-card .sc-desc strong {
+            color: var(--text-primary);
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .seun-content {
+                padding: 1rem;
+                padding-top: 3.5rem;
+            }
+
+            .seun-hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .seun-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .interaction-row {
+                flex-direction: column;
+            }
+
+            .month-block {
+                width: 60px;
+            }
+
+            .month-block .month-ganji-box {
+                width: 42px;
+                height: 42px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="메뉴 열기">
+        <i class="ph ph-list"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="seun-page">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="ph ph-sparkle"></i>
+                    <span>AI 명리</span>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="user-profile">
+                    <div class="section-title"><i class="ph ph-user-circle"></i> 내 사주 명식 (만세력)</div>
+                    <div class="profile-card">
+                        <div class="profile-name" id="display-name">방문자</div>
+                        <div class="profile-detail" id="display-birth">생년월일 미입력</div>
+                    </div>
+                </div>
+
+                <div class="saju-grid">
+                    <div class="grid-header">시주</div>
+                    <div class="grid-header">일주</div>
+                    <div class="grid-header">월주</div>
+                    <div class="grid-header">년주</div>
+                    <div class="pillar-box" id="hour-stem">?</div>
+                    <div class="pillar-box day-master" id="day-stem">?</div>
+                    <div class="pillar-box" id="month-stem">?</div>
+                    <div class="pillar-box" id="year-stem">?</div>
+                    <div class="pillar-box" id="hour-branch">?</div>
+                    <div class="pillar-box" id="day-branch">?</div>
+                    <div class="pillar-box" id="month-branch">?</div>
+                    <div class="pillar-box" id="year-branch">?</div>
+                </div>
+
+                <div class="analysis-card">
+                    <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
+                    <p id="day-master-desc">대화창에서 사주를 먼저 뽑아주세요.</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html"><i class="ph ph-chat-circle-text"></i> 상담실</a>
+                <a href="daeun.html"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
+                <a href="seun.html" class="active"><i class="ph ph-calendar-dots"></i> 세운 분석</a>
+                <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+                <button class="theme-toggle" id="theme-toggle">
+                    <span class="theme-icon"><i class="ph ph-moon"></i></span>
+                    <span class="theme-label">라이트 모드</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="seun-content" id="seun-content">
+            <div class="no-data-msg" id="no-data-msg">
+                <p>📅 세운 분석을 보려면</p>
+                <p><a href="index.html">상담실</a>에서 먼저 생년월일시를 입력해 주세요.</p>
+            </div>
+            <div id="seun-loaded" style="display:none;">
+                <!-- JS가 동적으로 채움 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="manseryeok.js"></script>
+    <script>
+        // ===== 테마 & 모바일 사이드바 초기화 =====
+        (function initSeunUI() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            function updateBtn(theme) {
+                const toggle = document.getElementById('theme-toggle');
+                if (!toggle) return;
+                const icon = toggle.querySelector('.theme-icon i');
+                const label = toggle.querySelector('.theme-label');
+                if (theme === 'dark') {
+                    if (icon) icon.className = 'ph ph-moon';
+                    if (label) label.textContent = '라이트 모드';
+                } else {
+                    if (icon) icon.className = 'ph ph-sun';
+                    if (label) label.textContent = '다크 모드';
+                }
+            }
+            updateBtn(savedTheme);
+
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
+                const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = cur === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateBtn(next);
+            });
+
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const overlay = document.getElementById('sidebar-overlay');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    if (overlay) overlay.classList.toggle('active');
+                });
+            }
+            if (overlay && sidebar) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            // ===== 세운 분석 페이지 스크립트 =====
+            const Manseryeok = window.Manseryeok;
+
+            const _STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+            const _BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const _SIXTY = [];
+            for (let i = 0; i < 60; i++) _SIXTY.push(_STEMS[i % 10] + _BRANCHES[i % 12]);
+
+            const EL_COLORS = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#a1a1aa', Water: '#3b82f6' };
+
+            function getElementColor(el) { return EL_COLORS[el] || '#666'; }
+
+            function getElementKorean(el) {
+                const m = { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' };
+                return m[el] || '';
+            }
+
+            function getYearGanji(year) {
+                const idx = ((year - 1984) % 60 + 60) % 60;
+                return _SIXTY[idx];
+            }
+
+            // 월간지 계산 (연간 기반 월건 공식)
+            function getMonthGanji(year, month) {
+                // 연간 인덱스
+                const yearStemIdx = ((year - 1984) % 10 + 10) % 10;
+                // 월건 공식: 해당 연의 인월(1월=寅月)의 천간 시작
+                // 甲己년: 丙寅 시작, 乙庚년: 戊寅, 丙辛년: 庚寅, 丁壬년: 壬寅, 戊癸년: 甲寅
+                const monthStemStart = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0]; // 甲寅→丙, 乙→戊...
+                const stemStart = monthStemStart[yearStemIdx];
+                const monthOffset = month - 1; // 1월=0 offset
+                const stemIdx = (stemStart + monthOffset) % 10;
+                const branchIdx = (month + 1) % 12; // 1월=寅(2)
+                return _STEMS[stemIdx] + _BRANCHES[branchIdx];
+            }
+
+            function getRelation(dayMasterElement, targetElement) {
+                if (targetElement === dayMasterElement) return '비겁(比劫)';
+                const cycle = { Wood: 'Fire', Fire: 'Earth', Earth: 'Metal', Metal: 'Water', Water: 'Wood' };
+                const ctrl = { Wood: 'Earth', Earth: 'Water', Water: 'Fire', Fire: 'Metal', Metal: 'Wood' };
+                if (cycle[dayMasterElement] === targetElement) return '식상(食傷)';
+                if (cycle[targetElement] === dayMasterElement) return '인성(印星)';
+                if (ctrl[dayMasterElement] === targetElement) return '재성(財星)';
+                if (ctrl[targetElement] === dayMasterElement) return '관성(官星)';
+                return '';
+            }
+
+            function getRelDesc(rel) {
+                const d = {
+                    '비겁(比劫)': '나와 같은 기운 — 자신감·경쟁·독립심이 높아집니다.',
+                    '식상(食傷)': '표현·창의의 기운 — 아이디어와 활동이 펼쳐집니다.',
+                    '재성(財星)': '재물·현실의 기운 — 재정적 기회가 찾아옵니다.',
+                    '관성(官星)': '명예·책임의 기운 — 직장·지위·시험운이 작용합니다.',
+                    '인성(印星)': '학문·보호의 기운 — 배움과 성장의 시기입니다.'
+                };
+                return d[rel] || '';
+            }
+
+            function getRelStrategy(rel) {
+                const s = {
+                    '비겁(比劫)': '💡 독립적인 사업이나 프로젝트에 도전하세요. 주변과의 마찰에 주의하고 협력을 의식하세요.',
+                    '식상(食傷)': '💡 자기표현, 창작, 부업 등 아웃풋을 늘리세요. 감정 소모를 관리하고 구체적 성과로 연결하세요.',
+                    '재성(財星)': '💡 투자와 자산 관리에 적극 나서세요. 욕심보다는 안정적인 수익 구조에 집중하세요.',
+                    '관성(官星)': '💡 조직 내 포지션을 강화하세요. 자격증, 승진 등 사회적 신용을 쌓되 스트레스를 관리하세요.',
+                    '인성(印星)': '💡 배움과 자기계발에 투자하기 최적의 시기입니다. 학업, 독서, 멘토링에 집중하세요.'
+                };
+                return s[rel] || '';
+            }
+
+            function getRelKeyword(rel) {
+                const k = {
+                    '비겁(比劫)': '자신감과 경쟁의 해',
+                    '식상(食傷)': '표현과 창의의 해',
+                    '재성(財星)': '재물과 성과의 해',
+                    '관성(官星)': '명예와 책임의 해',
+                    '인성(印星)': '배움과 성장의 해'
+                };
+                return k[rel] || '';
+            }
+
+            // 사이드바 사주 표시
+            function updateSidebar(chart) {
+                const ecMap = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#a1a1aa', Water: '#3b82f6' };
+                function setPillar(type, info) {
+                    const s = document.getElementById(`${type}-stem`);
+                    const b = document.getElementById(`${type}-branch`);
+                    if (s && info.stem) { s.textContent = info.stem; s.style.color = ecMap[info.stemElement] || ''; }
+                    if (b && info.branch) { b.textContent = info.branch; b.style.color = ecMap[info.branchElement] || ''; }
+                }
+                if (chart.year) setPillar('year', chart.year);
+                if (chart.month) setPillar('month', chart.month);
+                if (chart.day) setPillar('day', chart.day);
+                if (chart.hour) setPillar('hour', chart.hour);
+            }
+
+            function initPage() {
+                const stored = localStorage.getItem('sajuData');
+                if (!stored) return;
+
+                let sajuData;
+                try { sajuData = JSON.parse(stored); } catch (e) { return; }
+                if (!sajuData || !sajuData.chart) return;
+
+                document.getElementById('no-data-msg').style.display = 'none';
+                document.getElementById('seun-loaded').style.display = 'block';
+
+                const { chart, daeun, userProfile } = sajuData;
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth() + 1;
+                const birthYear = parseInt(userProfile.birth.split('-')[0]);
+
+                updateSidebar(chart);
+                if (userProfile) {
+                    document.getElementById('display-name').textContent = userProfile.name || '방문자';
+                    document.getElementById('display-birth').textContent = userProfile.birth || '';
+                }
+
+                // 일간 오행
+                const dayMasterInfo = Manseryeok.HEAVENLY_STEMS[chart.day.stem];
+                const dayMasterElement = dayMasterInfo ? dayMasterInfo.element : 'Wood';
+
+                // 일간 분석 표시
+                if (dayMasterInfo) {
+                    const elK = { Wood: '목', Fire: '화', Earth: '토', Metal: '금', Water: '수' };
+                    const yy = { Wood: '양의 기운', Fire: '양의 기운', Earth: '양의 기운', Metal: '양의 기운', Water: '양의 기운' };
+                    document.getElementById('day-master-desc').textContent =
+                        `일간 ${chart.day.stem}(${dayMasterInfo.korean}) - ${elK[dayMasterElement]}(${dayMasterElement})`;
+                }
+
+                // 올해 세운 계산
+                const thisYearGanji = getYearGanji(currentYear);
+                const yGanjiStem = thisYearGanji[0];
+                const yGanjiBranch = thisYearGanji[1];
+                const yStemInfo = Manseryeok.HEAVENLY_STEMS[yGanjiStem];
+                const yBranchInfo = Manseryeok.EARTHLY_BRANCHES[yGanjiBranch];
+                const yStemEl = yStemInfo ? yStemInfo.element : '';
+                const yBranchEl = yBranchInfo ? yBranchInfo.element : '';
+                const yStemRel = getRelation(dayMasterElement, yStemEl);
+                const yBranchRel = getRelation(dayMasterElement, yBranchEl);
+
+                // 현재 대운 찾기
+                const currentAge = currentYear - birthYear;
+                let currentDaeun = null;
+                if (daeun && daeun.daeunList) {
+                    currentDaeun = daeun.daeunList.find(d => currentAge >= d.ageStart && currentAge <= d.ageEnd);
+                }
+
+                let html = '';
+
+                // ========== 1. 올해 세운 요약 ==========
+                html += `<h1>📅 ${currentYear}년 세운 분석</h1>`;
+                html += `<p class="subtitle">${userProfile.name || '방문자'}님의 ${currentYear}년 운세 흐름입니다.</p>`;
+
+                html += `<div class="seun-hero">`;
+                html += `<div class="hero-ganji" style="color:${getElementColor(yStemEl)}">${thisYearGanji}</div>`;
+                html += `<div class="hero-info">`;
+                html += `<div class="hero-year">${currentYear}년 ${yStemInfo ? yStemInfo.korean : ''}${yBranchInfo ? yBranchInfo.korean : ''} (${getElementKorean(yStemEl)} · ${getElementKorean(yBranchEl)})</div>`;
+                html += `<div class="hero-keyword">🎯 ${getRelKeyword(yStemRel)}</div>`;
+                html += `<div class="hero-detail">천간 ${yStemRel} · 지지 ${yBranchRel}</div>`;
+                if (currentDaeun) {
+                    html += `<div class="hero-daeun-badge">🔮 현재 대운: ${currentDaeun.ganji} (${currentDaeun.ganjiKorean}) ${currentDaeun.ageStart}~${currentDaeun.ageEnd}세</div>`;
+                }
+                html += `</div></div>`;
+
+                // ========== 2. 상호작용 분석 ==========
+                html += `<h2 class="section-heading">⚡ 올해 세운 ↔ 내 사주 상호작용</h2>`;
+                html += `<div class="interaction-panel">`;
+                html += `<div class="interaction-row">`;
+                // 천간 카드
+                html += `<div class="interaction-card">`;
+                html += `<div class="ic-label">세운 천간 → 일간</div>`;
+                html += `<div class="ic-value" style="color:${getElementColor(yStemEl)}">${yGanjiStem} (${yStemInfo ? yStemInfo.korean : ''}) → ${chart.day.stem}</div>`;
+                html += `<div class="ic-rel">${yStemRel}</div>`;
+                html += `<div class="ic-desc">${getRelDesc(yStemRel)}</div>`;
+                html += `</div>`;
+                // 지지 카드
+                html += `<div class="interaction-card">`;
+                html += `<div class="ic-label">세운 지지 → 일지</div>`;
+                html += `<div class="ic-value" style="color:${getElementColor(yBranchEl)}">${yGanjiBranch} (${yBranchInfo ? yBranchInfo.korean : ''}) → ${chart.day.branch}</div>`;
+                html += `<div class="ic-rel">${yBranchRel}</div>`;
+                html += `<div class="ic-desc">${getRelDesc(yBranchRel)}</div>`;
+                html += `</div>`;
+                html += `</div>`;
+                // 전략
+                html += `<div class="strategy-box">${getRelStrategy(yStemRel)}</div>`;
+                html += `</div>`;
+
+                // ========== 3. 월운 타임라인 ==========
+                html += `<h2 class="section-heading">🗓️ ${currentYear}년 월운 (12개월)</h2>`;
+                html += `<div class="month-timeline" id="month-timeline">`;
+                for (let m = 1; m <= 12; m++) {
+                    const mGanji = getMonthGanji(currentYear, m);
+                    const mStem = mGanji[0];
+                    const mBranch = mGanji[1];
+                    const mStemInfo = Manseryeok.HEAVENLY_STEMS[mStem];
+                    const mStemEl = mStemInfo ? mStemInfo.element : '';
+                    const mRel = getRelation(dayMasterElement, mStemEl);
+                    const isCurrent = m === currentMonth;
+
+                    html += `<div class="month-block ${isCurrent ? 'current' : ''}" data-month="${m}" onclick="window._selectMonth(${m})">`;
+                    html += `<div class="month-ganji-box" style="color:${getElementColor(mStemEl)}">${mGanji}</div>`;
+                    html += `<div class="month-label">${m}월</div>`;
+                    html += `<div class="month-rel">${mRel.replace(/\(.+\)/, '')}</div>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                html += `<div id="month-detail-container"></div>`;
+
+                // 현재 월 자동 선택
+                window._selectMonth = function (m) {
+                    const mGanji = getMonthGanji(currentYear, m);
+                    const mStem = mGanji[0];
+                    const mBranch = mGanji[1];
+                    const mStemInfo = Manseryeok.HEAVENLY_STEMS[mStem];
+                    const mBranchInfo = Manseryeok.EARTHLY_BRANCHES[mBranch];
+                    const mStemEl = mStemInfo ? mStemInfo.element : '';
+                    const mBranchEl = mBranchInfo ? mBranchInfo.element : '';
+                    const mStemRel = getRelation(dayMasterElement, mStemEl);
+                    const mBranchRel = getRelation(dayMasterElement, mBranchEl);
+
+                    // 선택 하이라이트
+                    document.querySelectorAll('.month-block').forEach(b => b.classList.remove('selected'));
+                    const target = document.querySelector(`.month-block[data-month="${m}"]`);
+                    if (target) target.classList.add('selected');
+
+                    let detail = `<div class="month-detail-panel">`;
+                    detail += `<strong style="font-size:1.1rem;color:${getElementColor(mStemEl)}">${mGanji}</strong>`;
+                    detail += ` <span style="color:var(--text-secondary)">${m}월 · ${mStemInfo ? mStemInfo.korean : ''}${mBranchInfo ? mBranchInfo.korean : ''}</span>`;
+                    detail += `<br><br>`;
+                    detail += `<strong>천간</strong> ${getElementKorean(mStemEl)} (${mStemRel}): ${getRelDesc(mStemRel)}`;
+                    if (mBranchRel !== mStemRel) {
+                        detail += `<br><strong>지지</strong> ${getElementKorean(mBranchEl)} (${mBranchRel}): ${getRelDesc(mBranchRel)}`;
+                    }
+                    detail += `<br><span style="opacity:0.85;margin-top:0.3rem;display:inline-block">${getRelStrategy(mStemRel)}</span>`;
+                    detail += `</div>`;
+                    document.getElementById('month-detail-container').innerHTML = detail;
+                };
+
+                // ========== 4. 전후 5년 타임라인 ==========
+                html += `<h2 class="section-heading">📊 전후 5년 세운 비교</h2>`;
+                html += `<div class="year-timeline">`;
+                for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+                    const yg = getYearGanji(y);
+                    const ys = yg[0];
+                    const ysi = Manseryeok.HEAVENLY_STEMS[ys];
+                    const ysel = ysi ? ysi.element : '';
+                    const yr = getRelation(dayMasterElement, ysel);
+                    const isCur = y === currentYear;
+                    html += `<div class="year-block ${isCur ? 'current' : ''}">`;
+                    html += `<div class="yb-ganji" style="color:${getElementColor(ysel)}">${yg}</div>`;
+                    html += `<div class="yb-year">${y}</div>`;
+                    html += `<div class="yb-rel">${yr.replace(/\(.+\)/, '')}</div>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                // ========== 5. 연도별 해설 카드 ==========
+                html += `<h2 class="section-heading">📖 연도별 세운 해설</h2>`;
+                html += `<div class="seun-cards">`;
+                for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+                    const yg = getYearGanji(y);
+                    const ys = yg[0];
+                    const yb = yg[1];
+                    const ysi = Manseryeok.HEAVENLY_STEMS[ys];
+                    const ybi = Manseryeok.EARTHLY_BRANCHES[yb];
+                    const ysel = ysi ? ysi.element : '';
+                    const ybel = ybi ? ybi.element : '';
+                    const ysRel = getRelation(dayMasterElement, ysel);
+                    const ybRel = getRelation(dayMasterElement, ybel);
+                    const isCur = y === currentYear;
+
+                    html += `<div class="seun-card ${isCur ? 'current' : ''}">`;
+                    html += `<div class="sc-header">`;
+                    html += `<span class="sc-ganji" style="color:${getElementColor(ysel)}">${yg}</span>`;
+                    html += `<span class="sc-meta">${y}년 · ${ysi ? ysi.korean : ''}${ybi ? ybi.korean : ''}${isCur ? ' 🟡 올해' : ''}</span>`;
+                    html += `</div>`;
+                    html += `<div class="sc-desc">`;
+                    html += `<strong>천간</strong> ${getElementKorean(ysel)} (${ysRel}): ${getRelDesc(ysRel)}`;
+                    if (ybRel !== ysRel) {
+                        html += `<br><strong>지지</strong> ${getElementKorean(ybel)} (${ybRel}): ${getRelDesc(ybRel)}`;
+                    }
+                    html += `<br><span style="opacity:0.85">${getRelStrategy(ysRel)}</span>`;
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+
+                document.getElementById('seun-loaded').innerHTML = html;
+
+                // 현재 월 자동 선택
+                setTimeout(() => window._selectMonth(currentMonth), 100);
+            }
+
+            initPage();
+        })();
+    </script>
+</body>
+
+</html>
