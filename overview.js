@@ -78,6 +78,164 @@
         return summaries[top] || `${stemInfo.emoji} ${stemInfo.name}, 타고난 기운을 잘 활용하여 올해의 기회를 잡으세요.`;
     }
 
+    // ===== 도입 페이지 (DJ 명리 소개) =====
+    function renderIntro(container) {
+        container.innerHTML = `
+        <div class="intro-page">
+            <!-- Hero -->
+            <div class="intro-hero">
+                <div class="intro-hero-badge">AI 사주 · 새로운 관점</div>
+                <h1 class="intro-hero-title">
+                    <span class="intro-gradient">DJ 명리</span>
+                </h1>
+                <p class="intro-hero-sub">운명을 예언하지 않습니다.<br>당신의 패를 읽고, <strong>플레이 전략</strong>을 세웁니다.</p>
+            </div>
+
+            <!-- 카드 게임 메타포 -->
+            <div class="intro-card intro-card-accent">
+                <div class="intro-card-icon">🃏</div>
+                <h2>인생은 10장의 카드 게임</h2>
+                <p>태어날 때 받은 <strong>8장의 카드</strong>(사주 원국)와<br>매해 추가되는 <strong>2장의 카드</strong>(세운)로 게임이 펼쳐집니다.</p>
+                <div class="intro-cards-visual">
+                    <div class="intro-card-stack">
+                        <div class="intro-minicard" style="--i:0">年</div>
+                        <div class="intro-minicard" style="--i:1">年</div>
+                        <div class="intro-minicard" style="--i:2">月</div>
+                        <div class="intro-minicard" style="--i:3">月</div>
+                        <div class="intro-minicard intro-minicard-me" style="--i:4">日</div>
+                        <div class="intro-minicard" style="--i:5">日</div>
+                        <div class="intro-minicard" style="--i:6">時</div>
+                        <div class="intro-minicard" style="--i:7">時</div>
+                    </div>
+                    <div class="intro-plus">+</div>
+                    <div class="intro-card-stack">
+                        <div class="intro-minicard intro-minicard-year" style="--i:0">歲</div>
+                        <div class="intro-minicard intro-minicard-year" style="--i:1">運</div>
+                    </div>
+                </div>
+                <p class="intro-card-bottom">승패는 패가 아니라 <strong>플레이어</strong>가 결정합니다.</p>
+            </div>
+
+            <!-- DJ 명리가 다른 점 -->
+            <div class="intro-card">
+                <h2>🎛️ 기존 사주와 어떻게 다른가요?</h2>
+                <div class="intro-compare">
+                    <div class="intro-compare-col intro-compare-old">
+                        <div class="intro-compare-label">전통적 사주 풀이</div>
+                        <ul>
+                            <li>❌ "올해 재물운이 좋다 / 나쁘다"</li>
+                            <li>❌ "남편복이 없는 사주"</li>
+                            <li>❌ "초년고생, 중년발복"</li>
+                            <li>❌ 막연한 길흉 예언</li>
+                        </ul>
+                    </div>
+                    <div class="intro-compare-col intro-compare-new">
+                        <div class="intro-compare-label">DJ 명리</div>
+                        <ul>
+                            <li>✅ "당신의 재물 감각은 이런 성향"</li>
+                            <li>✅ "관계에서 이런 패턴이 보여요"</li>
+                            <li>✅ "올해의 전략은 이렇게"</li>
+                            <li>✅ 구체적인 행동 전략 제시</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오행 소개 -->
+            <div class="intro-card">
+                <h2>🌊 오행 — 삶의 5가지 질문</h2>
+                <p class="intro-card-desc">오행은 자연의 원소가 아니라, 삶을 이해하는 <strong>5가지 관점</strong>입니다.</p>
+                <div class="intro-elements">
+                    <div class="intro-elem" style="--ec:#22c55e">
+                        <div class="intro-elem-icon">🌲</div>
+                        <div class="intro-elem-name">목(木)</div>
+                        <div class="intro-elem-q">나를 어떻게 세울 것인가</div>
+                    </div>
+                    <div class="intro-elem" style="--ec:#ef4444">
+                        <div class="intro-elem-icon">🔥</div>
+                        <div class="intro-elem-name">화(火)</div>
+                        <div class="intro-elem-q">어떻게 자유로울 것인가</div>
+                    </div>
+                    <div class="intro-elem" style="--ec:#eab308">
+                        <div class="intro-elem-icon">⛰️</div>
+                        <div class="intro-elem-name">토(土)</div>
+                        <div class="intro-elem-q">관계를 어떻게 맺을 것인가</div>
+                    </div>
+                    <div class="intro-elem" style="--ec:#a1a1aa">
+                        <div class="intro-elem-icon">⚔️</div>
+                        <div class="intro-elem-name">금(金)</div>
+                        <div class="intro-elem-q">옳고 그름을 어떻게 판단할 것인가</div>
+                    </div>
+                    <div class="intro-elem" style="--ec:#3b82f6">
+                        <div class="intro-elem-icon">🌊</div>
+                        <div class="intro-elem-name">수(水)</div>
+                        <div class="intro-elem-q">나는 누구인가</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="intro-card intro-cta">
+                <div class="intro-cta-emoji">🔮</div>
+                <h2>지금 바로 시작하세요</h2>
+                <p>왼쪽 사이드바에서 생년월일을 입력하면<br>당신만의 사주 해설이 시작됩니다.</p>
+            </div>
+        </div>
+
+        <style>
+            .intro-page{max-width:680px;margin:0 auto;padding:1.5rem 0 3rem}
+            .intro-hero{text-align:center;padding:2rem 0 1.5rem}
+            .intro-hero-badge{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.05em;padding:.25rem .7rem;border-radius:20px;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(236,72,153,.15));border:1px solid rgba(167,139,250,.25);color:#a78bfa;margin-bottom:.8rem}
+            .intro-hero-title{font-family:'Noto Serif KR',serif;font-size:2.2rem;font-weight:800;margin:0 0 .6rem;line-height:1.2}
+            .intro-gradient{background:linear-gradient(135deg,#a78bfa,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+            .intro-hero-sub{font-size:.95rem;color:var(--text-secondary);line-height:1.6}
+            .intro-card{background:var(--bg-secondary,#1e1e2e);border:1px solid var(--border-color,#333);border-radius:18px;padding:1.5rem;margin-bottom:1rem}
+            .intro-card h2{font-family:'Noto Serif KR',serif;font-size:1.15rem;margin:0 0 .6rem;color:var(--text-primary)}
+            .intro-card p{font-size:.88rem;color:var(--text-secondary);line-height:1.6;margin:.3rem 0}
+            .intro-card-accent{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(236,72,153,.08));border-color:rgba(167,139,250,.25);text-align:center}
+            .intro-card-icon{font-size:2.5rem;margin-bottom:.5rem}
+            .intro-card-bottom{margin-top:.8rem;font-weight:600;color:var(--text-primary)}
+            .intro-card-desc{margin-bottom:1rem!important}
+
+            /* 카드 비주얼 */
+            .intro-cards-visual{display:flex;align-items:center;justify-content:center;gap:1rem;margin:1.2rem 0}
+            .intro-card-stack{display:flex;gap:.3rem}
+            .intro-minicard{width:32px;height:44px;border-radius:6px;background:var(--bg-elevated,#2a2a3a);border:1px solid var(--border-color,#444);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--text-muted);animation:cardFloat 2s ease-in-out calc(var(--i) * .15s) infinite alternate}
+            .intro-minicard-me{background:linear-gradient(135deg,#a78bfa,#ec4899);color:#fff;border-color:transparent;box-shadow:0 2px 12px rgba(167,139,250,.3)}
+            .intro-minicard-year{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.3);color:#60a5fa}
+            .intro-plus{font-size:1.3rem;font-weight:700;color:var(--text-muted)}
+            @keyframes cardFloat{to{transform:translateY(-3px)}}
+
+            /* 비교 */
+            .intro-compare{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.8rem}
+            .intro-compare-col{padding:1rem;border-radius:12px}
+            .intro-compare-old{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15)}
+            .intro-compare-new{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15)}
+            .intro-compare-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.5rem;color:var(--text-muted)}
+            .intro-compare-col ul{list-style:none;padding:0;margin:0}
+            .intro-compare-col li{font-size:.78rem;color:var(--text-secondary);padding:.25rem 0;line-height:1.4}
+
+            /* 오행 */
+            .intro-elements{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem}
+            .intro-elem{text-align:center;padding:.8rem .3rem;border-radius:12px;background:var(--bg-elevated,#2a2a3a);border:1px solid var(--border-color,#444);transition:transform .2s}
+            .intro-elem:hover{transform:translateY(-3px)}
+            .intro-elem-icon{font-size:1.5rem;margin-bottom:.3rem}
+            .intro-elem-name{font-size:.82rem;font-weight:700;color:var(--ec);margin-bottom:.2rem}
+            .intro-elem-q{font-size:.62rem;color:var(--text-muted);line-height:1.3}
+
+            /* CTA */
+            .intro-cta{text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(236,72,153,.1));border-color:rgba(167,139,250,.2)}
+            .intro-cta-emoji{font-size:2.5rem;margin-bottom:.5rem}
+
+            @media(max-width:600px){
+                .intro-hero-title{font-size:1.6rem}
+                .intro-compare{grid-template-columns:1fr}
+                .intro-elements{grid-template-columns:repeat(3,1fr)}
+            }
+        </style>
+        `;
+    }
+
     // ===== 메인 렌더링 =====
     function render() {
         const container = document.getElementById('overview-content');
@@ -85,7 +243,7 @@
 
         const stored = localStorage.getItem('sajuData');
         if (!stored) {
-            container.innerHTML = '<div class="ov-empty"><p>왼쪽 사이드바에서 사주 정보를 입력해 주세요.</p></div>';
+            renderIntro(container);
             return;
         }
 
@@ -264,7 +422,9 @@
             clearBtn.onclick = () => {
                 if (confirm('모든 조회 기록을 삭제할까요?')) {
                     localStorage.removeItem('queryList');
+                    localStorage.removeItem('sajuData');
                     renderQueryList();
+                    render();
                 }
             };
         }
