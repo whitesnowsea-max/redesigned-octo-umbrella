@@ -466,6 +466,15 @@ async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
 
+    // 크레딧 체크 (credits.js 로드 시에만)
+    if (window.SajuCredits) {
+        const credits = window.SajuCredits.getCredits();
+        if (credits <= 0) {
+            window.SajuCredits.showCreditShop();
+            return;
+        }
+    }
+
     // API 키는 서버에서 관리되므로 클라이언트 검증 불필요
 
     addMessage("user", text);
@@ -615,6 +624,11 @@ AI가 자체 계산하지 말고 위 데이터를 사용하세요.
 
         addMessage("ai", displayText);
         removeMessage(loadingId);
+
+        // 크레딧 차감 (AI 응답 성공 시)
+        if (window.SajuCredits) {
+            window.SajuCredits.useCredit();
+        }
 
     } catch (error) {
         console.error(error);

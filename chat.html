@@ -151,14 +151,13 @@
 
     <script src="manseryeok.js"></script>
     <script src="script.js"></script>
-    <script src="paywall.js"></script>
+    <script src="credits.js"></script>
     <script>
-        // 프리미엄 체크
+        // 크레딧 시스템 초기화
         (function () {
-            const hasSaju = !!localStorage.getItem('sajuData');
-            if (hasSaju && !window.SajuPaywall.isPremium()) {
-                window.SajuPaywall.showPaywall(document.querySelector('.chat-interface'));
-            }
+            window.SajuCredits.initFirstVisit();
+            window.SajuCredits.injectBadge();
+            window.SajuCredits.updateBadge();
         })();
     </script>
 </body>
