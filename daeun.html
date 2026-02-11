@@ -320,6 +320,7 @@
         .energy-bar-container {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
             margin-bottom: 0.75rem;
         }
 
@@ -331,24 +332,25 @@
 
         .energy-bar-bg {
             flex: 1;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.05);
+            height: 22px;
+            background: rgba(255, 255, 255, 0.06);
             border-radius: 6px;
             overflow: hidden;
-            position: relative;
         }
 
         .energy-bar {
             height: 100%;
             border-radius: 6px;
             transition: width 0.6s ease;
-            display: flex;
-            align-items: center;
-            padding-left: 8px;
+        }
+
+        .energy-pct {
             font-size: 0.75rem;
             font-weight: 700;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+            color: var(--text-primary);
+            min-width: 36px;
+            text-align: right;
+            flex-shrink: 0;
         }
 
         .energy-bar.wood {
@@ -819,7 +821,7 @@
                     const pct = Math.round((elementCounts[el] / total) * 100);
                     html += `<div class="energy-bar-container">`;
                     html += `<div class="energy-label">${getElementKorean(el)}</div>`;
-                    html += `<div class="energy-bar-bg"><div class="energy-bar ${el.toLowerCase()}" style="width:${Math.max(pct, 5)}%">${pct}%</div></div>`;
+                    html += `<div class="energy-bar-bg"><div class="energy-bar ${el.toLowerCase()}" style="width:${Math.max(pct, 5)}%"></div></div><span class="energy-pct">${pct}%</span>`;
                     html += `</div>`;
                 });
                 html += `</div>`;
