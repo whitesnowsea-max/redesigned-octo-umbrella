@@ -288,13 +288,16 @@
 
     // ===== 테마 =====
     function initTheme() {
-        const saved = localStorage.getItem('theme');
-        if (saved === 'light') { document.body.classList.add('light-mode'); updateThemeUI(true); }
+        const saved = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+        updateThemeUI(saved === 'light');
     }
     function toggleTheme() {
-        const isLight = document.body.classList.toggle('light-mode');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        updateThemeUI(isLight);
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeUI(next === 'light');
     }
     function updateThemeUI(isLight) {
         const icon = document.querySelector('.theme-icon i');
