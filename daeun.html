@@ -529,10 +529,48 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* daeun 페이지 반응형 */
+        @media (max-width: 768px) {
+            .daeun-content {
+                padding: 1rem;
+                padding-top: 3.5rem;
+            }
+
+            .daeun-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .daeun-analysis-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .daeun-block {
+                width: 70px;
+            }
+
+            .daeun-block .ganji-box {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+
+            .seun-table {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="메뉴 열기">
+        <i class="ph ph-list"></i>
+    </button>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div class="daeun-page">
         <!-- Sidebar (같은 구조) -->
         <aside class="sidebar">
@@ -584,6 +622,10 @@
                 <a href="index.html"><i class="ph ph-chat-circle-text"></i> 상담실</a>
                 <a href="daeun.html" class="active"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
                 <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+                <button class="theme-toggle" id="theme-toggle">
+                    <span class="theme-icon"><i class="ph ph-moon"></i></span>
+                    <span class="theme-label">라이트 모드</span>
+                </button>
             </nav>
         </aside>
 
@@ -600,6 +642,54 @@
     </div>
 
     <script src="manseryeok.js"></script>
+    <script>
+        // ===== 테마 & 모바일 사이드바 초기화 (daeun 전용) =====
+        (function initDaeunUI() {
+            // 테마 복원
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            function updateBtn(theme) {
+                const toggle = document.getElementById('theme-toggle');
+                if (!toggle) return;
+                const icon = toggle.querySelector('.theme-icon i');
+                const label = toggle.querySelector('.theme-label');
+                if (theme === 'dark') {
+                    if (icon) icon.className = 'ph ph-moon';
+                    if (label) label.textContent = '라이트 모드';
+                } else {
+                    if (icon) icon.className = 'ph ph-sun';
+                    if (label) label.textContent = '다크 모드';
+                }
+            }
+            updateBtn(savedTheme);
+
+            document.getElementById('theme-toggle')?.addEventListener('click', () => {
+                const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = cur === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateBtn(next);
+            });
+
+            // 모바일 사이드바
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const overlay = document.getElementById('sidebar-overlay');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuBtn && sidebar) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    if (overlay) overlay.classList.toggle('active');
+                });
+            }
+            if (overlay && sidebar) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                });
+            }
+        })();
+    </script>
     <script>
         (function () {
             // ===== 대운 흐름 페이지 스크립트 =====

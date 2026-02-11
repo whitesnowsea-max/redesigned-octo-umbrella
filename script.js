@@ -24,7 +24,66 @@ window.addEventListener('DOMContentLoaded', () => {
     if (sajuSubmitBtn) {
         sajuSubmitBtn.addEventListener('click', submitSajuForm);
     }
+
+    // ===== 테마 전환 =====
+    initTheme();
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // ===== 모바일 사이드바 토글 =====
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.toggle('active');
+            }
+        });
+    }
+
+    if (sidebarOverlay && sidebar) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
 });
+
+// 테마 초기화 (localStorage에서 복원)
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeButton(savedTheme);
+}
+
+// 테마 전환
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeButton(next);
+}
+
+// 테마 버튼 UI 업데이트
+function updateThemeButton(theme) {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    const icon = toggle.querySelector('.theme-icon i');
+    const label = toggle.querySelector('.theme-label');
+    if (theme === 'dark') {
+        if (icon) icon.className = 'ph ph-moon';
+        if (label) label.textContent = '라이트 모드';
+    } else {
+        if (icon) icon.className = 'ph ph-sun';
+        if (label) label.textContent = '다크 모드';
+    }
+}
 
 // Map Element String to CSS Class
 const ELEMENT_MAP = {

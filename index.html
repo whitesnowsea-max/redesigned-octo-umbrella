@@ -22,6 +22,14 @@
 
 <body>
 
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="메뉴 열기">
+        <i class="ph ph-list"></i>
+    </button>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <!-- Main App Container (No Modal) -->
     <div class="app-container" id="main-app">
 
@@ -146,6 +154,10 @@
                 <a href="index.html" class="active"><i class="ph ph-chat-circle-text"></i> 상담실</a>
                 <a href="daeun.html"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
                 <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+                <button class="theme-toggle" id="theme-toggle">
+                    <span class="theme-icon"><i class="ph ph-moon"></i></span>
+                    <span class="theme-label">라이트 모드</span>
+                </button>
             </nav>
         </aside>
 
