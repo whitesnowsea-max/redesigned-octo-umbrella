@@ -7,7 +7,7 @@
 
     // ===== 설정 =====
     const CONFIG = {
-        IMP_CODE: 'imp00000000',            // ← PortOne 가맹점 식별코드 (실제 코드로 교체)
+        IMP_CODE: 'imp04022566',            // PortOne 가맹점 식별코드
         PG: 'kakaopay',                      // PG사 (kakaopay, tosspayments, nice_v2 등)
         AMOUNT: 4900,                        // 결제 금액 (원)
         PRODUCT_NAME: 'DJ 명리 프리미엄 분석',
