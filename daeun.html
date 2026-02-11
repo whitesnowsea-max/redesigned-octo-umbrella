@@ -308,69 +308,103 @@
             display: none;
         }
 
-        /* --- 오행 에너지 바 차트 --- */
+        /* --- 오행 에너지 도넛 차트 --- */
         .energy-chart {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2rem;
-        }
-
-        .energy-bar-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .energy-label {
-            width: 70px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .energy-bar-bg {
-            flex: 1;
-            height: 22px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .energy-bar {
-            height: 100%;
-            border-radius: 6px;
-            transition: width 0.6s ease;
-        }
-
-        .energy-pct {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            min-width: 36px;
-            text-align: right;
+        .donut-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
             flex-shrink: 0;
         }
 
-        .energy-bar.wood {
-            background: linear-gradient(90deg, #22c55e, #4ade80);
+        .donut-container svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
         }
 
-        .energy-bar.fire {
-            background: linear-gradient(90deg, #ef4444, #f87171);
+        .donut-container svg circle {
+            fill: none;
+            stroke-width: 28;
+            transition: stroke-dashoffset 0.6s ease;
         }
 
-        .energy-bar.earth {
-            background: linear-gradient(90deg, #eab308, #facc15);
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
         }
 
-        .energy-bar.metal {
-            background: linear-gradient(90deg, #a1a1aa, #d4d4d8);
+        .donut-center .donut-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
         }
 
-        .energy-bar.water {
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        .donut-center .donut-total {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .energy-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .legend-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            width: 40px;
+        }
+
+        .legend-pct {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .legend-bar-bg {
+            width: 80px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .legend-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
         }
 
         /* --- 세운 테이블 --- */
@@ -808,22 +842,50 @@
                 html += `</div>`;
                 html += `<div id="daeun-detail-container"></div>`;
 
-                // ========== 3. 오행 에너지 분포 (대운별) ==========
+                // ========== 3. 오행 에너지 분포 (도넛 차트) ==========
                 html += `<h2 class="section-heading">🌊 대운별 오행 에너지</h2>`;
-                html += `<div class="energy-chart">`;
                 const elementCounts = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
                 daeun.daeunList.forEach(d => {
                     elementCounts[d.stemElement]++;
                     elementCounts[d.branchElement]++;
                 });
                 const total = daeun.daeunList.length * 2;
-                ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].forEach(el => {
+
+                const elColors = {
+                    Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308',
+                    Metal: '#a1a1aa', Water: '#3b82f6'
+                };
+                const elOrder = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
+                const circumference = 2 * Math.PI * 60; // r=60
+
+                // SVG 도넛 생성
+                let svgArcs = '';
+                let offset = 0;
+                elOrder.forEach(el => {
+                    const pct = elementCounts[el] / total;
+                    const dashLen = pct * circumference;
+                    svgArcs += `<circle cx="90" cy="90" r="60" stroke="${elColors[el]}" stroke-dasharray="${dashLen} ${circumference - dashLen}" stroke-dashoffset="${-offset}" />`;
+                    offset += dashLen;
+                });
+
+                html += `<div class="energy-chart">`;
+                html += `<div class="donut-container">`;
+                html += `<svg viewBox="0 0 180 180">${svgArcs}</svg>`;
+                html += `<div class="donut-center"><div class="donut-title">오행 합계</div><div class="donut-total">${total}</div></div>`;
+                html += `</div>`;
+
+                // 범례
+                html += `<div class="energy-legend">`;
+                elOrder.forEach(el => {
                     const pct = Math.round((elementCounts[el] / total) * 100);
-                    html += `<div class="energy-bar-container">`;
-                    html += `<div class="energy-label">${getElementKorean(el)}</div>`;
-                    html += `<div class="energy-bar-bg"><div class="energy-bar ${el.toLowerCase()}" style="width:${Math.max(pct, 5)}%"></div></div><span class="energy-pct">${pct}%</span>`;
+                    html += `<div class="legend-item">`;
+                    html += `<div class="legend-color" style="background:${elColors[el]}"></div>`;
+                    html += `<span class="legend-name">${getElementKorean(el)}</span>`;
+                    html += `<div class="legend-bar-bg"><div class="legend-bar" style="width:${Math.max(pct, 5)}%;background:${elColors[el]}"></div></div>`;
+                    html += `<span class="legend-pct">${pct}%</span>`;
                     html += `</div>`;
                 });
+                html += `</div>`;
                 html += `</div>`;
 
                 // ========== 4. 대운 해설 카드 ==========
