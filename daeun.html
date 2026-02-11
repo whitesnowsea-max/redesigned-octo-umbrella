@@ -345,9 +345,10 @@
             display: flex;
             align-items: center;
             padding-left: 8px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
         }
 
         .energy-bar.wood {
@@ -896,8 +897,25 @@
                     '관성(官星)': '사회적 책임과 명예가 강화되는 시기로, 직장·승진·시험운이 작용합니다.',
                     '인성(印星)': '학문과 지혜가 깊어지는 시기로, 배움과 보호의 기운이 작용합니다.'
                 };
+                const strategies = {
+                    '비겁(比劫)': '💡 전략: 독립적인 사업이나 프로젝트에 도전하기 좋은 시기입니다. 다만 주변과의 경쟁이나 마찰에 주의하고, 협력과 조화를 의식적으로 추구하세요.',
+                    '식상(食傷)': '💡 전략: 자기표현, 창작, 부업, 강의 등 아웃풋을 늘려야 할 시기입니다. 감정 소모에 주의하고, 표현의 방향을 구체적인 성과물로 연결하세요.',
+                    '재성(財星)': '💡 전략: 투자, 사업 확장, 자산 관리에 적극적으로 나서세요. 욕심을 부리기보다는 안정적인 수익 구조를 만드는 데 집중하는 것이 핵심입니다.',
+                    '관성(官星)': '💡 전략: 조직 내에서의 포지션을 강화하세요. 자격증 취득, 승진 준비, 사회적 신용을 쌓는 활동에 집중하되, 과도한 스트레스 관리에 신경 쓰세요.',
+                    '인성(印星)': '💡 전략: 배움과 자기계발에 투자하기 최적의 시기입니다. 학업, 자격증, 독서, 멘토링 등을 통해 내면의 역량을 키우세요. 의존성이 강해질 수 있으니 주체성을 유지하세요.'
+                };
                 const stemDesc = descriptions[rel.stemRel] || '';
-                return `천간 ${getElementKorean(d.stemElement)}(${rel.stemRel})의 영향: ${stemDesc}`;
+                const branchDesc = descriptions[rel.branchRel] || '';
+                const strategy = strategies[rel.stemRel] || strategies[rel.branchRel] || '';
+
+                let result = `<strong>천간</strong> ${getElementKorean(d.stemElement)}(${rel.stemRel}): ${stemDesc}`;
+                if (rel.branchRel !== rel.stemRel && branchDesc) {
+                    result += `<br><strong>지지</strong> ${getElementKorean(d.branchElement)}(${rel.branchRel}): ${branchDesc}`;
+                }
+                if (strategy) {
+                    result += `<br><span style="margin-top:0.3rem;display:inline-block;opacity:0.85">${strategy}</span>`;
+                }
+                return result;
             }
 
             // 사이드바 사주 표시
