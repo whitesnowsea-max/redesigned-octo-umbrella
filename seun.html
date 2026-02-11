@@ -594,15 +594,40 @@
                 return d[rel] || '';
             }
 
-            function getRelStrategy(rel) {
+            function getRelStrategies(rel) {
                 const s = {
-                    '비겁(比劫)': '💡 독립적인 사업이나 프로젝트에 도전하세요. 주변과의 마찰에 주의하고 협력을 의식하세요.',
-                    '식상(食傷)': '💡 자기표현, 창작, 부업 등 아웃풋을 늘리세요. 감정 소모를 관리하고 구체적 성과로 연결하세요.',
-                    '재성(財星)': '💡 투자와 자산 관리에 적극 나서세요. 욕심보다는 안정적인 수익 구조에 집중하세요.',
-                    '관성(官星)': '💡 조직 내 포지션을 강화하세요. 자격증, 승진 등 사회적 신용을 쌓되 스트레스를 관리하세요.',
-                    '인성(印星)': '💡 배움과 자기계발에 투자하기 최적의 시기입니다. 학업, 독서, 멘토링에 집중하세요.'
+                    '비겁(比劫)': [
+                        '독립적인 사업이나 프로젝트에 도전하기 좋은 시기입니다.',
+                        '주변과의 경쟁이나 마찰에 주의하고, 협력과 조화를 의식적으로 추구하세요.',
+                        '재정적 동업이나 공동 투자는 신중하게 접근하세요.'
+                    ],
+                    '식상(食傷)': [
+                        '자기표현, 창작, 부업, 강의 등 아웃풋을 늘려야 할 시기입니다.',
+                        '감정 소모에 주의하고, 표현의 방향을 구체적인 성과물로 연결하세요.',
+                        'SNS, 블로그, 콘텐츠 제작 등 디지털 표현 채널을 적극 활용하세요.'
+                    ],
+                    '재성(財星)': [
+                        '투자, 사업 확장, 자산 관리에 적극적으로 나서세요.',
+                        '욕심을 부리기보다는 안정적인 수익 구조를 만드는 데 집중하세요.',
+                        '새로운 수입원을 발굴하거나, 기존 자산의 효율을 높이는 전략을 세우세요.'
+                    ],
+                    '관성(官星)': [
+                        '조직 내에서의 포지션을 강화하고, 신뢰를 쌓는 활동에 집중하세요.',
+                        '자격증 취득, 승진 준비, 사회적 신용을 쌓는 데 주력하세요.',
+                        '과도한 스트레스와 완벽주의에 대한 관리가 필수입니다.'
+                    ],
+                    '인성(印星)': [
+                        '학업, 자격증, 독서, 멘토링 등을 통해 내면의 역량을 키우세요.',
+                        '배움과 자기계발에 투자하기 최적의 시기입니다.',
+                        '의존성이 강해질 수 있으니 주체성을 유지하고 실행력을 갖추세요.'
+                    ]
                 };
-                return s[rel] || '';
+                return s[rel] || [];
+            }
+
+            function getRelStrategy(rel) {
+                const items = getRelStrategies(rel);
+                return items.length ? '💡 ' + items[0] : '';
             }
 
             function getRelKeyword(rel) {
@@ -818,7 +843,15 @@
                     if (ybRel !== ysRel) {
                         html += `<br><strong>지지</strong> ${getElementKorean(ybel)} (${ybRel}): ${getRelDesc(ybRel)}`;
                     }
-                    html += `<br><span style="opacity:0.85">${getRelStrategy(ysRel)}</span>`;
+                    const strategies = getRelStrategies(ysRel);
+                    if (strategies.length) {
+                        html += `<div style="margin-top:0.5rem;padding:0.5rem 0.7rem;background:rgba(245,158,11,0.06);border-radius:8px;border-left:3px solid rgba(245,158,11,0.4)">`;
+                        html += `<div style="font-weight:600;color:var(--text-primary);margin-bottom:0.3rem">💡 전략 가이드</div>`;
+                        strategies.forEach((st, i) => {
+                            html += `<div style="padding:0.15rem 0;color:var(--text-secondary)">• ${st}</div>`;
+                        });
+                        html += `</div>`;
+                    }
                     html += `</div></div>`;
                 }
                 html += `</div>`;
