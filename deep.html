@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심층 상담 - DJ 명리</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .deep-page {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .deep-content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .deep-content h1 {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            margin-bottom: .5rem;
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .deep-content .subtitle {
+            color: var(--text-secondary);
+            font-size: .9rem;
+            margin-bottom: 2rem;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .no-data-msg a {
+            color: #a78bfa;
+            text-decoration: underline;
+        }
+
+        .section-heading {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.15rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 생애 시기 카드 */
+        .life-stages {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .life-stage-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.3rem;
+            transition: border-color .3s;
+        }
+
+        .life-stage-card.current {
+            border-color: #a78bfa;
+            box-shadow: 0 0 18px rgba(167, 139, 250, .15);
+        }
+
+        .life-stage-card .ls-header {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            margin-bottom: .8rem;
+        }
+
+        .life-stage-card .ls-icon {
+            font-size: 1.5rem;
+        }
+
+        .life-stage-card .ls-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .life-stage-card .ls-period {
+            font-size: .72rem;
+            color: var(--text-muted);
+        }
+
+        .life-stage-card .ls-ganji {
+            display: flex;
+            gap: .4rem;
+            flex-wrap: wrap;
+            margin-bottom: .6rem;
+        }
+
+        .life-stage-card .ls-ganji-tag {
+            padding: .2rem .5rem;
+            border-radius: 6px;
+            font-size: .72rem;
+            font-weight: 600;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+        }
+
+        .life-stage-card .ls-desc {
+            font-size: .82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .life-stage-card .ls-desc strong {
+            color: var(--text-primary);
+        }
+
+        .life-stage-card .ls-strategy {
+            margin-top: .5rem;
+            padding: .5rem .7rem;
+            background: rgba(167, 139, 250, .06);
+            border-radius: 8px;
+            border-left: 3px solid rgba(167, 139, 250, .4);
+        }
+
+        .life-stage-card .ls-strategy .st-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: .25rem;
+            font-size: .8rem;
+        }
+
+        .life-stage-card .ls-strategy .st-item {
+            padding: .12rem 0;
+            color: var(--text-secondary);
+            font-size: .78rem;
+        }
+
+        /* 건강 분석 */
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .health-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+
+        .health-card .hc-header {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            margin-bottom: .6rem;
+        }
+
+        .health-card .hc-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .health-card .hc-element {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .health-card .hc-count {
+            font-size: .7rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .health-card .hc-organs {
+            font-size: .82rem;
+            color: var(--text-primary);
+            margin-bottom: .4rem;
+            font-weight: 500;
+        }
+
+        .health-card .hc-status {
+            font-size: .78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .health-card .hc-advice {
+            margin-top: .4rem;
+            font-size: .78rem;
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        .health-card.excess {
+            border-left: 3px solid #ef4444;
+        }
+
+        .health-card.deficient {
+            border-left: 3px solid #3b82f6;
+        }
+
+        .health-card.balanced {
+            border-left: 3px solid #22c55e;
+        }
+
+        /* 종합 전략 */
+        .strategy-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .strategy-item {
+            margin-bottom: 1rem;
+        }
+
+        .strategy-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .strategy-item .si-label {
+            font-size: .75rem;
+            color: var(--text-muted);
+            margin-bottom: .2rem;
+        }
+
+        .strategy-item .si-content {
+            font-size: .85rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .strategy-item .si-content strong {
+            color: var(--text-primary);
+        }
+
+        @media (max-width:768px) {
+            .deep-content {
+                padding: 1rem;
+                padding-top: 3.5rem;
+            }
+
+            .life-stages,
+            .health-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="메뉴 열기"><i class="ph ph-list"></i></button>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="deep-page">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand"><i class="ph ph-sparkle"></i><span>AI 명리</span></div>
+            </div>
+            <div class="sidebar-content">
+                <div class="user-profile">
+                    <div class="section-title"><i class="ph ph-user-circle"></i> 내 사주 명식 (만세력)</div>
+                    <div class="profile-card">
+                        <div class="profile-name" id="display-name">방문자</div>
+                        <div class="profile-detail" id="display-birth">생년월일 미입력</div>
+                    </div>
+                </div>
+                <div class="saju-grid">
+                    <div class="grid-header">시주</div>
+                    <div class="grid-header">일주</div>
+                    <div class="grid-header">월주</div>
+                    <div class="grid-header">년주</div>
+                    <div class="pillar-box" id="hour-stem">?</div>
+                    <div class="pillar-box day-master" id="day-stem">?</div>
+                    <div class="pillar-box" id="month-stem">?</div>
+                    <div class="pillar-box" id="year-stem">?</div>
+                    <div class="pillar-box" id="hour-branch">?</div>
+                    <div class="pillar-box" id="day-branch">?</div>
+                    <div class="pillar-box" id="month-branch">?</div>
+                    <div class="pillar-box" id="year-branch">?</div>
+                </div>
+                <div class="analysis-card">
+                    <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
+                    <p id="day-master-desc">대화창에서 사주를 먼저 뽑아주세요.</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html"><i class="ph ph-chat-circle-text"></i> 상담실</a>
+                <a href="deep.html" class="active"><i class="ph ph-magnifying-glass-plus"></i> 심층 상담</a>
+                <a href="daeun.html"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
+                <a href="seun.html"><i class="ph ph-calendar-dots"></i> 세운 분석</a>
+                <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+                <button class="theme-toggle" id="theme-toggle"><span class="theme-icon"><i
+                            class="ph ph-moon"></i></span><span class="theme-label">라이트 모드</span></button>
+            </nav>
+        </aside>
+        <div class="deep-content">
+            <div class="no-data-msg" id="no-data-msg">
+                <p>🔍 심층 상담을 보려면</p>
+                <p><a href="index.html">상담실</a>에서 먼저 생년월일시를 입력해 주세요.</p>
+            </div>
+            <div id="deep-loaded" style="display:none"></div>
+        </div>
+    </div>
+    <script src="manseryeok.js"></script>
+    <script>
+        // 테마 & 모바일
+        (function () {
+            const t = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+            function u(th) { const tg = document.getElementById('theme-toggle'); if (!tg) return; const i = tg.querySelector('.theme-icon i'), l = tg.querySelector('.theme-label'); if (th === 'dark') { if (i) i.className = 'ph ph-moon'; if (l) l.textContent = '라이트 모드'; } else { if (i) i.className = 'ph ph-sun'; if (l) l.textContent = '다크 모드'; } }
+            u(t);
+            document.getElementById('theme-toggle')?.addEventListener('click', () => { const c = document.documentElement.getAttribute('data-theme') || 'dark'; const n = c === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); localStorage.setItem('theme', n); u(n); });
+            const mb = document.getElementById('mobile-menu-btn'), ov = document.getElementById('sidebar-overlay'), sb = document.querySelector('.sidebar');
+            if (mb && sb) mb.addEventListener('click', () => { sb.classList.toggle('open'); if (ov) ov.classList.toggle('active'); });
+            if (ov && sb) ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('active'); });
+        })();
+    </script>
+    <script>
+        (function () {
+            const M = window.Manseryeok;
+            const _S = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+            const _B = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const _60 = []; for (let i = 0; i < 60; i++)_60.push(_S[i % 10] + _B[i % 12]);
+            const EC = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#a1a1aa', Water: '#3b82f6' };
+            function elColor(e) { return EC[e] || '#666'; }
+            function elK(e) { return { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' }[e] || ''; }
+            function rel(dm, te) {
+                if (te === dm) return '비겁(比劫)';
+                const cy = { Wood: 'Fire', Fire: 'Earth', Earth: 'Metal', Metal: 'Water', Water: 'Wood' };
+                const ct = { Wood: 'Earth', Earth: 'Water', Water: 'Fire', Fire: 'Metal', Metal: 'Wood' };
+                if (cy[dm] === te) return '식상(食傷)'; if (cy[te] === dm) return '인성(印星)';
+                if (ct[dm] === te) return '재성(財星)'; if (ct[te] === dm) return '관성(官星)'; return '';
+            }
+            function relDesc(r) { return { '비겁(比劫)': '자신감·경쟁·독립', '식상(食傷)': '표현·창의·활동', '재성(財星)': '재물·현실·성과', '관성(官星)': '명예·책임·지위', '인성(印星)': '학문·보호·성장' }[r] || ''; }
+
+            // 오행별 장기
+            const organMap = {
+                Wood: { organs: '간(肝)·담(膽)·눈·근육·손톱', excess: '두통, 눈 충혈, 근육 경련, 분노 조절 어려움', deficient: '시력 저하, 만성 피로, 근력 약화', advice_ex: '명상, 스트레칭, 녹색 채소 섭취, 음주 절제', advice_def: '간 건강 보조식품, 적절한 운동, 신선한 채소 섭취' },
+                Fire: { organs: '심장(心)·소장·혈관·혀', excess: '불면증, 가슴 두근거림, 구내염, 혈압 상승', deficient: '수족냉증, 저혈압, 무기력, 순환 장애', advice_ex: '심호흡, 유산소 운동 과하지 않게, 자극적 음식 줄이기', advice_def: '따뜻한 음식 섭취, 족욕, 혈액순환 개선 운동' },
+                Earth: { organs: '위(胃)·비장(脾)·입술·살(肌肉)', excess: '소화불량, 체중 증가, 부종, 과식 경향', deficient: '식욕부진, 소화력 저하, 빈혈, 기력 부족', advice_ex: '규칙적 식사, 과식 자제, 걷기 운동', advice_def: '소화 잘 되는 음식, 영양 보충, 따뜻한 차 섭취' },
+                Metal: { organs: '폐(肺)·대장·피부·코', excess: '피부 트러블, 알레르기, 변비, 호흡기 긴장', deficient: '감기 잦음, 피부 건조, 만성 기침, 면역력 저하', advice_ex: '호흡 운동, 수분 섭취, 자극적 환경 피하기', advice_def: '폐 건강 식품(배, 도라지), 보습 관리, 면역력 강화' },
+                Water: { organs: '신장(腎)·방광·뼈·귀', excess: '부종, 잦은 소변, 허리 냉증, 불안감', deficient: '뼈 약화, 청력 저하, 만성 요통, 체력 저하', advice_ex: '짠 음식 줄이기, 하체 운동, 스트레스 관리', advice_def: '검은콩·검은깨 등 신장 보양 식품, 충분한 수면' }
+            };
+
+            // 생애 시기 분류
+            function getLifeStages(daeunList, birthYear) {
+                const stages = [
+                    { name: '초년운', icon: '🌱', ageRange: '1~20세', start: 1, end: 20, desc: '성장기로, 학업과 성격 형성에 영향을 미치는 시기' },
+                    { name: '청년운', icon: '🔥', ageRange: '21~40세', start: 21, end: 40, desc: '사회 진출과 결혼, 커리어 기반을 다지는 시기' },
+                    { name: '중년운', icon: '🏔️', ageRange: '41~60세', start: 41, end: 60, desc: '사회적 성취와 안정, 리더십을 발휘하는 시기' },
+                    { name: '말년운', icon: '🌅', ageRange: '61세~', start: 61, end: 100, desc: '은퇴 후 건강 관리와 삶의 정리, 지혜를 나누는 시기' }
+                ];
+                return stages.map(s => {
+                    s.daeuns = daeunList.filter(d => d.ageEnd >= s.start && d.ageStart <= s.end);
+                    s.yearStart = birthYear + s.start;
+                    s.yearEnd = s.end < 100 ? birthYear + s.end : '';
+                    return s;
+                });
+            }
+
+            function getStageStrategy(rels) {
+                const strats = {
+                    '비겁(比劫)': ['자립심과 독립성을 키우세요.', '경쟁 속에서 협력을 배우는 것이 핵심입니다.'],
+                    '식상(食傷)': ['창의적 활동과 자기표현에 집중하세요.', '감정을 건강하게 발산하는 채널을 확보하세요.'],
+                    '재성(財星)': ['재테크와 자산 관리에 관심을 기울이세요.', '실질적 성과를 만들어내는 데 집중하세요.'],
+                    '관성(官星)': ['사회적 지위와 명예를 쌓을 기회입니다.', '규율과 책임감을 통해 신뢰를 구축하세요.'],
+                    '인성(印星)': ['학업과 자기계발에 투자하세요.', '멘토를 찾고 지식을 체계화하세요.']
+                };
+                const main = rels[0] || '';
+                return strats[main] || ['균형 잡힌 생활을 유지하세요.'];
+            }
+
+            function updateSidebar(chart) {
+                const ec = EC;
+                function sp(t, i) { const s = document.getElementById(`${t}-stem`), b = document.getElementById(`${t}-branch`); if (s && i.stem) { s.textContent = i.stem; s.style.color = ec[i.stemElement] || ''; } if (b && i.branch) { b.textContent = i.branch; b.style.color = ec[i.branchElement] || ''; } }
+                if (chart.year) sp('year', chart.year); if (chart.month) sp('month', chart.month); if (chart.day) sp('day', chart.day); if (chart.hour) sp('hour', chart.hour);
+            }
+
+            function init() {
+                const stored = localStorage.getItem('sajuData');
+                if (!stored) return;
+                let sd; try { sd = JSON.parse(stored); } catch (e) { return; }
+                if (!sd || !sd.chart || !sd.daeun) return;
+                document.getElementById('no-data-msg').style.display = 'none';
+                document.getElementById('deep-loaded').style.display = 'block';
+                const { chart, daeun, userProfile } = sd;
+                const now = new Date(), curYear = now.getFullYear();
+                const birthYear = parseInt(userProfile.birth.split('-')[0]);
+                const curAge = curYear - birthYear;
+                updateSidebar(chart);
+                if (userProfile) { document.getElementById('display-name').textContent = userProfile.name || '방문자'; document.getElementById('display-birth').textContent = userProfile.birth || ''; }
+                const dmi = M.HEAVENLY_STEMS[chart.day.stem];
+                const dm = dmi ? dmi.element : 'Wood';
+                if (dmi) { const ek = { Wood: '목', Fire: '화', Earth: '토', Metal: '금', Water: '수' }; document.getElementById('day-master-desc').textContent = `일간 ${chart.day.stem}(${dmi.korean}) - ${ek[dm]}(${dm})`; }
+
+                let html = '';
+                html += `<h1>🔍 ${userProfile.name || '방문자'}님의 심층 상담</h1>`;
+                html += `<p class="subtitle">사주 명식을 기반으로 생애 시기별 운세, 건강, 전략을 분석합니다.</p>`;
+
+                // ===== 1. 생애 시기별 운세 =====
+                html += `<h2 class="section-heading">🌿 생애 시기별 운세</h2>`;
+                html += `<div class="life-stages">`;
+                const stages = getLifeStages(daeun.daeunList, birthYear);
+                stages.forEach(s => {
+                    const isCur = curAge >= s.start && curAge <= s.end;
+                    html += `<div class="life-stage-card ${isCur ? 'current' : ''}">`;
+                    html += `<div class="ls-header"><span class="ls-icon">${s.icon}</span><div><div class="ls-title">${s.name}${isCur ? ' 🟢 현재' : ''}</div><div class="ls-period">${s.ageRange} (${s.yearStart}${s.yearEnd ? '~' + s.yearEnd : '~'})</div></div></div>`;
+                    // 해당 시기 대운 간지 태그
+                    html += `<div class="ls-ganji">`;
+                    const rels = [];
+                    s.daeuns.forEach(d => {
+                        const r = rel(dm, d.stemElement);
+                        rels.push(r);
+                        html += `<span class="ls-ganji-tag" style="color:${elColor(d.stemElement)}">${d.ganji} ${d.ganjiKorean} (${r.replace(/\(.+\)/, '')})</span>`;
+                    });
+                    html += `</div>`;
+                    // 설명
+                    html += `<div class="ls-desc">${s.desc}`;
+                    if (s.daeuns.length) {
+                        const mainRels = [...new Set(rels)];
+                        html += `<br><strong>주요 흐름:</strong> ${mainRels.map(r => `${r} — ${relDesc(r)}`).join(', ')}`;
+                    }
+                    html += `</div>`;
+                    // 전략
+                    const strats = getStageStrategy(rels);
+                    html += `<div class="ls-strategy"><div class="st-title">💡 전략</div>`;
+                    strats.forEach(st => html += `<div class="st-item">• ${st}</div>`);
+                    html += `</div></div>`;
+                });
+                html += `</div>`;
+
+                // ===== 2. 오행 건강 분석 =====
+                html += `<h2 class="section-heading">🏥 오행 건강 분석</h2>`;
+                html += `<div class="health-grid">`;
+                // 명식 오행 카운트
+                const elCnt = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+                ['year', 'month', 'day', 'hour'].forEach(p => {
+                    if (chart[p]) {
+                        const si = M.HEAVENLY_STEMS[chart[p].stem];
+                        const bi = M.EARTHLY_BRANCHES[chart[p].branch];
+                        if (si) elCnt[si.element]++;
+                        if (bi) elCnt[bi.element]++;
+                    }
+                });
+                const total = Object.values(elCnt).reduce((a, b) => a + b, 0);
+                const avg = total / 5;
+                ['Wood', 'Fire', 'Earth', 'Metal', 'Water'].forEach(e => {
+                    const cnt = elCnt[e];
+                    const info = organMap[e];
+                    let status, cls, desc, advice;
+                    if (cnt > avg + 0.5) { status = '과다(過多)'; cls = 'excess'; desc = info.excess; advice = info.advice_ex; }
+                    else if (cnt < avg - 0.5) { status = '부족(不足)'; cls = 'deficient'; desc = info.deficient; advice = info.advice_def; }
+                    else { status = '균형(均衡)'; cls = 'balanced'; desc = '현재 균형 잡힌 상태입니다.'; advice = '현재 상태를 유지하면서 규칙적인 생활 습관을 이어가세요.'; }
+                    html += `<div class="health-card ${cls}">`;
+                    html += `<div class="hc-header"><div class="hc-dot" style="background:${elColor(e)}"></div><span class="hc-element">${elK(e)}</span><span class="hc-count">${cnt}/${total} (${Math.round(cnt / total * 100)}%)</span></div>`;
+                    html += `<div class="hc-organs">🫀 관련 장기: ${info.organs}</div>`;
+                    html += `<div class="hc-status"><strong>${status}</strong> — ${desc}</div>`;
+                    html += `<div class="hc-advice">🩺 ${advice}</div>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
+
+                // ===== 3. 종합 전략 =====
+                html += `<h2 class="section-heading">🎯 종합 전략</h2>`;
+                html += `<div class="strategy-section">`;
+                // 가장 강한/약한 오행
+                const sorted = Object.entries(elCnt).sort((a, b) => b[1] - a[1]);
+                const strongest = sorted[0], weakest = sorted[sorted.length - 1];
+                html += `<div class="strategy-item"><div class="si-label">가장 강한 오행</div><div class="si-content"><strong style="color:${elColor(strongest[0])}">${elK(strongest[0])}</strong> (${strongest[1]}개) — ${organMap[strongest[0]].organs} 계통에 에너지가 집중됩니다. 과유불급을 조심하고 적절한 발산이 필요합니다.</div></div>`;
+                html += `<div class="strategy-item"><div class="si-label">가장 약한 오행</div><div class="si-content"><strong style="color:${elColor(weakest[0])}">${elK(weakest[0])}</strong> (${weakest[1]}개) — ${organMap[weakest[0]].organs} 계통의 약화에 주의하세요. 의식적으로 보양하는 것이 좋습니다.</div></div>`;
+                // 현재 대운 기반 전략
+                const curDaeun = daeun.daeunList.find(d => curAge >= d.ageStart && curAge <= d.ageEnd);
+                if (curDaeun) {
+                    const cr = rel(dm, curDaeun.stemElement);
+                    html += `<div class="strategy-item"><div class="si-label">현재 대운 (${curDaeun.ganji} ${curDaeun.ganjiKorean})</div><div class="si-content">${cr} — ${relDesc(cr)}의 기운이 흐르고 있습니다. 이 흐름에 맞추어 <strong>${cr.includes('재성') ? '재테크와 실질적 성과' : cr.includes('관성') ? '사회적 지위 강화' : cr.includes('인성') ? '학습과 자기계발' : cr.includes('식상') ? '창의적 표현과 활동' : '자립과 도전'}</strong>에 집중하세요.</div></div>`;
+                }
+                html += `<div class="strategy-item"><div class="si-label">건강 관리 핵심</div><div class="si-content">약한 오행인 <strong style="color:${elColor(weakest[0])}">${elK(weakest[0])}</strong> 관련 장기(${organMap[weakest[0]].organs})의 건강을 우선 점검하세요. ${organMap[weakest[0]].advice_def}</div></div>`;
+                html += `</div>`;
+
+                document.getElementById('deep-loaded').innerHTML = html;
+            }
+            init();
+        })();
+    </script>
+</body>
+
+</html>
