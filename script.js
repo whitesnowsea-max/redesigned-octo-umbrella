@@ -1064,7 +1064,7 @@ function submitSajuForm() {
 
     // 이름 부분
     if (name) {
-        message += `이름은 ${name}입니다. `;
+        message += `이름 ${name}. `;
     }
 
     // 생년월일 부분
