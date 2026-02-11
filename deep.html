@@ -262,6 +262,115 @@
             color: var(--text-primary);
         }
 
+        /* 개괄 해설 카드 */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.4rem;
+        }
+
+        .overview-card .oc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .25rem .65rem;
+            border-radius: 20px;
+            font-size: .7rem;
+            font-weight: 600;
+            margin-bottom: .8rem;
+        }
+
+        .overview-card .oc-badge.daeun {
+            background: rgba(139, 92, 246, .12);
+            color: #a78bfa;
+        }
+
+        .overview-card .oc-badge.seun {
+            background: rgba(59, 130, 246, .12);
+            color: #60a5fa;
+        }
+
+        .overview-card .oc-ganji {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: .3rem;
+        }
+
+        .overview-card .oc-meta {
+            font-size: .78rem;
+            color: var(--text-muted);
+            margin-bottom: .7rem;
+        }
+
+        .overview-card .oc-rel-tag {
+            display: inline-block;
+            padding: .2rem .5rem;
+            border-radius: 6px;
+            font-size: .72rem;
+            font-weight: 600;
+            margin-right: .4rem;
+            margin-bottom: .3rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+        }
+
+        .overview-card .oc-desc {
+            font-size: .84rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: .5rem;
+        }
+
+        .overview-card .oc-desc strong {
+            color: var(--text-primary);
+        }
+
+        .mixing-strategy {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.4rem;
+            margin-bottom: 2rem;
+        }
+
+        .mixing-strategy .ms-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: .8rem;
+        }
+
+        .mixing-strategy .ms-item {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: .6rem;
+            font-size: .84rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .mixing-strategy .ms-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .mixing-strategy .ms-icon {
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .mixing-strategy .ms-item strong {
+            color: var(--text-primary);
+        }
+
         @media (max-width:768px) {
             .deep-content {
                 padding: 1rem;
@@ -269,7 +378,8 @@
             }
 
             .life-stages,
-            .health-grid {
+            .health-grid,
+            .overview-cards {
                 grid-template-columns: 1fr;
             }
         }
@@ -359,6 +469,7 @@
             const EC = { Wood: '#22c55e', Fire: '#ef4444', Earth: '#eab308', Metal: '#a1a1aa', Water: '#3b82f6' };
             function elColor(e) { return EC[e] || '#666'; }
             function elK(e) { return { Wood: '목(木)', Fire: '화(火)', Earth: '토(土)', Metal: '금(金)', Water: '수(水)' }[e] || ''; }
+            function elKshort(e) { return { Wood: '목', Fire: '화', Earth: '토', Metal: '금', Water: '수' }[e] || ''; }
             function rel(dm, te) {
                 if (te === dm) return '비겁(比劫)';
                 const cy = { Wood: 'Fire', Fire: 'Earth', Earth: 'Metal', Metal: 'Water', Water: 'Wood' };
@@ -367,6 +478,34 @@
                 if (ct[dm] === te) return '재성(財星)'; if (ct[te] === dm) return '관성(官星)'; return '';
             }
             function relDesc(r) { return { '비겁(比劫)': '자신감·경쟁·독립', '식상(食傷)': '표현·창의·활동', '재성(財星)': '재물·현실·성과', '관성(官星)': '명예·책임·지위', '인성(印星)': '학문·보호·성장' }[r] || ''; }
+            function relLongDesc(r) {
+                return {
+                    '비겁(比劫)': '나와 같은 기운이 강해지는 시기입니다. 자신감과 독립심이 높아지지만, 경쟁과 마찰도 함께 올 수 있습니다. 주체성을 살리면서도 주변과의 조화를 의식적으로 추구해야 합니다.',
+                    '식상(食傷)': '표현력과 창의력이 꽃피는 시기입니다. 아이디어가 풍부해지고 자기표현 욕구가 강해집니다. 이 에너지를 구체적인 성과물로 연결하면 큰 결실을 맺을 수 있습니다.',
+                    '재성(財星)': '재물과 현실적 성과에 집중하는 시기입니다. 투자, 사업, 자산 관리에 유리한 흐름이지만, 과욕은 금물입니다. 안정적인 수익 구조를 만드는 데 집중하세요.',
+                    '관성(官星)': '명예와 책임이 강조되는 시기입니다. 사회적 지위가 상승하거나 더 큰 책임을 맡게 될 수 있습니다. 규율과 절제를 통해 신뢰를 구축하면 좋은 결과가 따릅니다.',
+                    '인성(印星)': '학문과 내면 성장의 시기입니다. 배움과 자기계발에 최적의 환경이 조성됩니다. 멘토를 찾고 지식을 체계화하되, 지나친 의존이나 수동성은 경계하세요.'
+                }[r] || '현재 운의 흐름을 잘 파악하고 균형 잡힌 전략으로 대응하세요.';
+            }
+            function getYearGanji(year) {
+                const idx = ((year - 1984) % 60 + 60) % 60;
+                return _60[idx];
+            }
+            function getMixingStrategies(daeunRel, seunRel) {
+                const strategies = [];
+                // 대운 기반
+                const dBase = { '비겁(比劫)': '자립과 도전', '식상(食傷)': '창의적 표현', '재성(財星)': '재테크와 자산 관리', '관성(官星)': '사회적 지위 강화', '인성(印星)': '학습과 자기계발' };
+                const sBase = { '비겁(比劫)': '경쟁력 강화', '식상(食傷)': '아웃풋 확대', '재성(財星)': '수익 극대화', '관성(官星)': '포지셔닝 확립', '인성(印星)': '역량 축적' };
+                strategies.push({ icon: '🔮', text: `<strong>대운의 큰 흐름</strong>은 ${daeunRel}(${relDesc(daeunRel)})로, <strong>${dBase[daeunRel] || '균형 잡힌 행보'}</strong>의 기조를 유지하세요.` });
+                strategies.push({ icon: '📅', text: `<strong>올해의 테마</strong>는 ${seunRel}(${relDesc(seunRel)})로, <strong>${sBase[seunRel] || '안정 추구'}</strong>에 에너지를 집중하세요.` });
+                // 조합 시너지/주의
+                if (daeunRel === seunRel) {
+                    strategies.push({ icon: '⚡', text: `대운과 세운의 기운이 <strong>같은 방향</strong>으로 흐르고 있어 에너지가 집중됩니다. 이 흐름을 적극 활용하되, 과잉에 주의하세요.` });
+                } else {
+                    strategies.push({ icon: '🔄', text: `대운(${daeunRel.replace(/\(.+\)/, '')})과 세운(${seunRel.replace(/\(.+\)/, '')})의 흐름이 다르므로, <strong>큰 틀은 대운</strong>을 따르되 <strong>올해의 기회</strong>는 세운의 흐름에 맞추어 포착하세요.` });
+                }
+                return strategies;
+            }
 
             // 오행별 장기
             const organMap = {
@@ -430,7 +569,57 @@
 
                 let html = '';
                 html += `<h1>🔍 ${userProfile.name || '방문자'}님의 심층 상담</h1>`;
-                html += `<p class="subtitle">사주 명식을 기반으로 생애 시기별 운세, 건강, 전략을 분석합니다.</p>`;
+                html += `<p class="subtitle">사주 명식을 기반으로 현재 운세, 건강, 전략을 종합 분석합니다.</p>`;
+
+                // ===== 0. 대운·세운 개괄 해설 =====
+                html += `<h2 class="section-heading">🔮 현재의 흐름</h2>`;
+                html += `<div class="overview-cards">`;
+
+                // 대운 카드
+                const curDaeun = daeun.daeunList.find(d => curAge >= d.ageStart && curAge <= d.ageEnd);
+                let daeunRel = '';
+                if (curDaeun) {
+                    const dStemInfo = M.HEAVENLY_STEMS[curDaeun.ganji[0]];
+                    const dBranchInfo = M.EARTHLY_BRANCHES[curDaeun.ganji[1]];
+                    daeunRel = rel(dm, curDaeun.stemElement);
+                    const dBranchRel = rel(dm, dBranchInfo ? dBranchInfo.element : dm);
+                    html += `<div class="overview-card">`;
+                    html += `<div class="oc-badge daeun">🔮 현재 대운 (10년 주기)</div>`;
+                    html += `<div class="oc-ganji" style="color:${elColor(curDaeun.stemElement)}">${curDaeun.ganji} <span style="font-size:.9rem;font-weight:400">${curDaeun.ganjiKorean}</span></div>`;
+                    html += `<div class="oc-meta">${curDaeun.ageStart}세 ~ ${curDaeun.ageEnd}세 · ${elKshort(curDaeun.stemElement)}(${curDaeun.stemElement}) 기운</div>`;
+                    html += `<span class="oc-rel-tag" style="color:${elColor(curDaeun.stemElement)}">천간 ${daeunRel}</span>`;
+                    html += `<span class="oc-rel-tag" style="color:${elColor(dBranchInfo ? dBranchInfo.element : dm)}">지지 ${dBranchRel}</span>`;
+                    html += `<div class="oc-desc">${relLongDesc(daeunRel)}</div>`;
+                    html += `</div>`;
+                }
+
+                // 세운 카드
+                const yg = getYearGanji(curYear);
+                const yStem = yg[0], yBranch = yg[1];
+                const ySI = M.HEAVENLY_STEMS[yStem], yBI = M.EARTHLY_BRANCHES[yBranch];
+                const ySE = ySI ? ySI.element : '', yBE = yBI ? yBI.element : '';
+                const seunRel = rel(dm, ySE);
+                const seunBranchRel = rel(dm, yBE);
+                html += `<div class="overview-card">`;
+                html += `<div class="oc-badge seun">📅 ${curYear}년 세운 (올해)</div>`;
+                html += `<div class="oc-ganji" style="color:${elColor(ySE)}">${yg} <span style="font-size:.9rem;font-weight:400">${ySI ? ySI.korean : ''}${yBI ? yBI.korean : ''}</span></div>`;
+                html += `<div class="oc-meta">${curYear}년 · ${elKshort(ySE)}(${ySE}) · ${elKshort(yBE)}(${yBE}) 기운</div>`;
+                html += `<span class="oc-rel-tag" style="color:${elColor(ySE)}">천간 ${seunRel}</span>`;
+                html += `<span class="oc-rel-tag" style="color:${elColor(yBE)}">지지 ${seunBranchRel}</span>`;
+                html += `<div class="oc-desc">${relLongDesc(seunRel)}</div>`;
+                html += `</div>`;
+                html += `</div>`;
+
+                // 운명 믹싱 전략
+                if (curDaeun) {
+                    const mixStrats = getMixingStrategies(daeunRel, seunRel);
+                    html += `<div class="mixing-strategy">`;
+                    html += `<div class="ms-title">🎧 DJ 명리의 운명 믹싱 전략</div>`;
+                    mixStrats.forEach(s => {
+                        html += `<div class="ms-item"><span class="ms-icon">${s.icon}</span><div>${s.text}</div></div>`;
+                    });
+                    html += `</div>`;
+                }
 
                 // ===== 1. 생애 시기별 운세 =====
                 html += `<h2 class="section-heading">🌿 생애 시기별 운세</h2>`;
@@ -504,7 +693,7 @@
                 html += `<div class="strategy-item"><div class="si-label">가장 강한 오행</div><div class="si-content"><strong style="color:${elColor(strongest[0])}">${elK(strongest[0])}</strong> (${strongest[1]}개) — ${organMap[strongest[0]].organs} 계통에 에너지가 집중됩니다. 과유불급을 조심하고 적절한 발산이 필요합니다.</div></div>`;
                 html += `<div class="strategy-item"><div class="si-label">가장 약한 오행</div><div class="si-content"><strong style="color:${elColor(weakest[0])}">${elK(weakest[0])}</strong> (${weakest[1]}개) — ${organMap[weakest[0]].organs} 계통의 약화에 주의하세요. 의식적으로 보양하는 것이 좋습니다.</div></div>`;
                 // 현재 대운 기반 전략
-                const curDaeun = daeun.daeunList.find(d => curAge >= d.ageStart && curAge <= d.ageEnd);
+                // curDaeun은 상단에서 이미 선언됨
                 if (curDaeun) {
                     const cr = rel(dm, curDaeun.stemElement);
                     html += `<div class="strategy-item"><div class="si-label">현재 대운 (${curDaeun.ganji} ${curDaeun.ganjiKorean})</div><div class="si-content">${cr} — ${relDesc(cr)}의 기운이 흐르고 있습니다. 이 흐름에 맞추어 <strong>${cr.includes('재성') ? '재테크와 실질적 성과' : cr.includes('관성') ? '사회적 지위 강화' : cr.includes('인성') ? '학습과 자기계발' : cr.includes('식상') ? '창의적 표현과 활동' : '자립과 도전'}</strong>에 집중하세요.</div></div>`;
