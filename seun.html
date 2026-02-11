@@ -708,7 +708,10 @@
                 const yStemEl = yStemInfo ? yStemInfo.element : '';
                 const yBranchEl = yBranchInfo ? yBranchInfo.element : '';
                 const yStemRel = getRelation(dayMasterElement, yStemEl);
-                const yBranchRel = getRelation(dayMasterElement, yBranchEl);
+                // 지지 관계: 일지(日支) 오행 기준
+                const dayBranchInfo = Manseryeok.EARTHLY_BRANCHES[chart.day.branch];
+                const dayBranchElement = dayBranchInfo ? dayBranchInfo.element : dayMasterElement;
+                const yBranchRel = getRelation(dayBranchElement, yBranchEl);
 
                 // 현재 대운 찾기
                 const currentAge = currentYear - birthYear;
