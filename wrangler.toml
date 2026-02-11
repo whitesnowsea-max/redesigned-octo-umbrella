@@ -8,3 +8,7 @@ zone_id = ""
 [site]
 bucket = "./"
 entry-point = ""
+
+[[kv_namespaces]]
+binding = "SAJU_USERS"
+id = "f2a7b5fab53e477e89f4c6a64dc3aece"

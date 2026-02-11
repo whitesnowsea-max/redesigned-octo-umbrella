@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 중... - DJ 명리</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0d0d1a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .loader {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(167, 139, 250, .3);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .msg {
+            font-size: .9rem;
+            color: #94a3b8;
+        }
+
+        .err {
+            color: #ef4444;
+            margin-top: 1rem;
+            font-size: .85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <div class="msg" id="status">카카오 로그인 처리 중...</div>
+        <div class="err" id="error" style="display:none"></div>
+    </div>
+    <script>
+        (async function () {
+            const status = document.getElementById('status');
+            const errorEl = document.getElementById('error');
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get('code');
+                const err = params.get('error');
+
+                if (err) throw new Error('카카오 로그인이 취소되었습니다.');
+                if (!code) throw new Error('인가 코드가 없습니다.');
+
+                status.textContent = '사용자 정보 확인 중...';
+
+                const res = await fetch('/api/auth/kakao', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await res.json();
+
+                if (!data.success) throw new Error(data.message || '인증 실패');
+
+                // 세션 저장
+                localStorage.setItem('sajuSession', JSON.stringify({
+                    token: data.sessionToken,
+                    user: data.user
+                }));
+
+                // 크레딧 동기화
+                localStorage.setItem('sajuCredits', JSON.stringify({
+                    balance: data.user.credits,
+                    updatedAt: new Date().toISOString(),
+                    synced: true
+                }));
+
+                status.textContent = `${data.user.nickname}님 환영합니다! 🎉`;
+
+                setTimeout(() => {
+                    // 이전 페이지로 복귀
+                    const returnTo = localStorage.getItem('loginReturnTo') || '/';
+                    localStorage.removeItem('loginReturnTo');
+                    window.location.href = returnTo;
+                }, 1000);
+
+            } catch (e) {
+                status.textContent = '로그인 실패';
+                errorEl.style.display = 'block';
+                errorEl.textContent = e.message;
+                setTimeout(() => { window.location.href = '/'; }, 3000);
+            }
+        })();
+    </script>
+</body>
+
+</html>

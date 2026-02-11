@@ -40,7 +40,13 @@
         } catch { return []; }
     }
 
-    function useCredit() {
+    async function useCredit() {
+        // 로그인 상태면 서버 차감
+        if (window.SajuAuth && window.SajuAuth.isLoggedIn()) {
+            const ok = await window.SajuAuth.serverUseCredit();
+            if (ok) { updateBadge(); return true; }
+        }
+        // 비로그인 또는 서버 실패 시 로컬 차감
         const balance = getCredits();
         if (balance <= 0) return false;
         const history = getHistory();
@@ -49,7 +55,13 @@
         return true;
     }
 
-    function addCredits(n, purchaseId) {
+    async function addCredits(n, purchaseId) {
+        // 로그인 상태면 서버 충전
+        if (window.SajuAuth && window.SajuAuth.isLoggedIn()) {
+            const ok = await window.SajuAuth.serverAddCredits(n, purchaseId);
+            if (ok) { updateBadge(); return; }
+        }
+        // 비로그인 또는 서버 실패 시 로컬 충전
         const balance = getCredits();
         const history = getHistory();
         history.push({ type: 'purchase', amount: n, purchaseId, at: new Date().toISOString() });
@@ -225,7 +237,7 @@
                     } catch (e) { console.warn('검증 서버 호출 실패 (무시):', e); }
 
                     // 크레딧 추가
-                    addCredits(product.credits, rsp.imp_uid);
+                    await addCredits(product.credits, rsp.imp_uid);
                     buyBtn.textContent = `✅ ${product.credits}크레딧 충전 완료!`;
 
                     setTimeout(() => {

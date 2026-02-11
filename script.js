@@ -627,7 +627,7 @@ AI가 자체 계산하지 말고 위 데이터를 사용하세요.
 
         // 크레딧 차감 (AI 응답 성공 시)
         if (window.SajuCredits) {
-            window.SajuCredits.useCredit();
+            await window.SajuCredits.useCredit();
         }
 
     } catch (error) {
