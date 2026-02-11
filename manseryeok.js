@@ -258,6 +258,48 @@ function getElementKorean(element) {
     return map[element] || element;
 }
 
+/**
+ * 음력 → 양력 변환
+ * 만세력 데이터에서 음력 날짜에 해당하는 양력 날짜를 검색합니다.
+ * @param {number} lunarYear - 음력 연도
+ * @param {number} lunarMonth - 음력 월 (1-12)
+ * @param {number} lunarDay - 음력 일 (1-30)
+ * @param {boolean} isLeapMonth - 윤달 여부 (기본 false)
+ * @returns {Object|null} { year, month, day } 양력 날짜 또는 null
+ */
+async function lunarToSolar(lunarYear, lunarMonth, lunarDay, isLeapMonth = false) {
+    await loadManseryeokData();
+
+    const lmStr = String(lunarMonth);
+    const ldStr = String(lunarDay);
+
+    // 검색 범위: 음력 연도 기준 양력 연도 ±1년
+    const startYear = lunarYear;
+    const endYear = lunarYear + 1;
+
+    for (let y = startYear; y <= endYear; y++) {
+        for (let m = 1; m <= 12; m++) {
+            const daysInMonth = new Date(y, m, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateKey = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+                const record = manseryeokData[dateKey];
+                if (!record) continue;
+
+                if (record.ly === lunarYear &&
+                    record.lm === lmStr &&
+                    record.ld === ldStr) {
+                    // 윤달 구분: leap==1이면 윤달
+                    if (isLeapMonth && record.leap !== 1) continue;
+                    if (!isLeapMonth && record.leap === 1) continue;
+                    return { year: y, month: m, day: d };
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
 // ========== 대운 계산 ==========
 
 // 천간, 지지 순서 배열
@@ -349,7 +391,7 @@ async function calculateDaeun(year, month, day, hour, gender) {
     // 1. 순행/역행 결정
     const yearStemYinYang = HEAVENLY_STEMS[yearStem].yinyang;
     const isMale = gender === '남성' || gender === '남';
-    
+
     // 양남음녀 → 순행, 음남양녀 → 역행
     let isForward;
     if (isMale) {
@@ -432,6 +474,7 @@ window.Manseryeok = {
     getCurrentDaeun: getCurrentDaeun,
     getChartForAI: getSajuChartForAI,
     getElementKorean: getElementKorean,
+    lunarToSolar: lunarToSolar,
     HEAVENLY_STEMS,
     EARTHLY_BRANCHES,
     SIXTY_GANJI

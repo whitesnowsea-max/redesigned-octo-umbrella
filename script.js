@@ -289,7 +289,10 @@ function parseBirthInfo(text) {
     // 유효성 검사
     if (year && month && day) {
         if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-            return { year, month, day, hour, name, gender };
+            // 음력/양력 구분
+            let calendarType = '양력'; // 기본 양력
+            if (/음력/.test(text)) calendarType = '음력';
+            return { year, month, day, hour, name, gender, calendarType };
         }
     }
 
@@ -301,8 +304,28 @@ function parseBirthInfo(text) {
  */
 async function calculateAndDisplaySaju(birthInfo) {
     try {
+        // 음력인 경우 양력으로 변환
+        let solarYear = birthInfo.year;
+        let solarMonth = birthInfo.month;
+        let solarDay = birthInfo.day;
+        let lunarLabel = '';
+
+        if (birthInfo.calendarType === '음력' && window.Manseryeok.lunarToSolar) {
+            const solar = await window.Manseryeok.lunarToSolar(
+                birthInfo.year, birthInfo.month, birthInfo.day
+            );
+            if (!solar) {
+                throw new Error(`음력 ${birthInfo.year}년 ${birthInfo.month}월 ${birthInfo.day}일에 해당하는 양력 날짜를 찾을 수 없습니다.`);
+            }
+            solarYear = solar.year;
+            solarMonth = solar.month;
+            solarDay = solar.day;
+            lunarLabel = ` [음력 ${birthInfo.year}.${birthInfo.month}.${birthInfo.day}]`;
+            console.log(`음력→양력 변환: ${birthInfo.year}.${birthInfo.month}.${birthInfo.day} → ${solarYear}.${solarMonth}.${solarDay}`);
+        }
+
         const saju = await window.Manseryeok.calculate(
-            birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour
+            solarYear, solarMonth, solarDay, birthInfo.hour
         );
 
         state.currentSaju = saju;
@@ -312,7 +335,7 @@ async function calculateAndDisplaySaju(birthInfo) {
         const genderForDaeun = birthInfo.gender || '남성';
         try {
             daeunResult = await window.Manseryeok.calculateDaeun(
-                birthInfo.year, birthInfo.month, birthInfo.day, birthInfo.hour, genderForDaeun
+                solarYear, solarMonth, solarDay, birthInfo.hour, genderForDaeun
             );
             state.currentDaeun = daeunResult;
         } catch (daeunErr) {
@@ -323,7 +346,7 @@ async function calculateAndDisplaySaju(birthInfo) {
         const chartData = {
             userProfile: {
                 name: birthInfo.name || '방문자',
-                birth: `${birthInfo.year}-${String(birthInfo.month).padStart(2, '0')}-${String(birthInfo.day).padStart(2, '0')} (${birthInfo.hour}시)`,
+                birth: `${solarYear}-${String(solarMonth).padStart(2, '0')}-${String(solarDay).padStart(2, '0')} (${birthInfo.hour}시)${lunarLabel}`,
                 gender: birthInfo.gender || '미상'
             },
             chart: {
