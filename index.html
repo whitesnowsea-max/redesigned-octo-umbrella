@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 사주 마스터 - DJ 명리</title>
+    <title>간단 해설 - DJ 명리</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -14,10 +13,261 @@
         rel="stylesheet">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
-    <!-- Marked for Markdown rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* ===== 간단 해설 페이지 전용 CSS ===== */
+        .overview-page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .overview-page h1 {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.5rem;
+            margin-bottom: .3rem;
+            color: var(--text-primary);
+        }
+
+        .ov-subtitle {
+            color: var(--text-muted);
+            font-size: .85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ov-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 4rem 1rem;
+            font-size: .95rem;
+        }
+
+        .ov-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ov-card-badge {
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: .8rem;
+        }
+
+        .ov-hero {
+            text-align: center;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated));
+        }
+
+        .ov-hero-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: .3rem 0;
+        }
+
+        .ov-hero-nature {
+            font-size: .85rem;
+            color: var(--text-muted);
+            margin-bottom: .7rem;
+        }
+
+        .ov-hero-desc {
+            font-size: .88rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .ov-pillars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .8rem;
+            margin-bottom: 1rem;
+        }
+
+        .ov-pillar {
+            text-align: center;
+        }
+
+        .ov-pillar-label {
+            font-size: .65rem;
+            color: var(--text-muted);
+            margin-bottom: .3rem;
+        }
+
+        .ov-pillar-stem,
+        .ov-pillar-branch {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .ov-pillar-el {
+            font-size: .6rem;
+            color: var(--text-muted);
+            margin-top: .2rem;
+        }
+
+        .ov-relations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+            margin-top: .5rem;
+        }
+
+        .ov-rel-tag {
+            font-size: .7rem;
+            border: 1px solid;
+            padding: .2rem .5rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .ov-elem-bars {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .ov-elem-row {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .ov-elem-label {
+            width: 55px;
+            font-size: .78rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .ov-elem-bar {
+            flex: 1;
+            height: 20px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .ov-elem-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width .6s ease;
+        }
+
+        .ov-elem-pct {
+            font-size: .7rem;
+            color: var(--text-muted);
+            width: 65px;
+        }
+
+        .ov-balance-advice {
+            margin-top: .8rem;
+            font-size: .82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: .8rem;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+        }
+
+        .ov-summary {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(167, 139, 250, .08), rgba(236, 72, 153, .08));
+        }
+
+        .ov-summary-text {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            line-height: 1.7;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        .ov-premium-cta {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(167, 139, 250, .12), rgba(236, 72, 153, .12));
+            border-color: rgba(167, 139, 250, .3);
+        }
+
+        .ov-premium-emoji {
+            font-size: 2.5rem;
+            margin-bottom: .5rem;
+        }
+
+        .ov-premium-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: .4rem;
+        }
+
+        .ov-premium-desc {
+            font-size: .82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .ov-premium-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            justify-content: center;
+        }
+
+        .ov-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            padding: .5rem 1rem;
+            border-radius: 10px;
+            font-size: .8rem;
+            font-weight: 500;
+            text-decoration: none;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            transition: all .2s;
+        }
+
+        .ov-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .ov-link-pro {
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        @media (max-width:600px) {
+            .overview-page {
+                padding: 1rem;
+            }
+
+            .ov-pillars {
+                gap: .4rem;
+            }
+
+            .ov-pillar-stem,
+            .ov-pillar-branch {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -30,10 +280,9 @@
     <!-- Sidebar Overlay (mobile) -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <!-- Main App Container (No Modal) -->
     <div class="app-container" id="main-app">
 
-        <!-- Sidebar: Saju Chart -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="brand">
@@ -42,98 +291,39 @@
                 </div>
             </div>
 
-            <!-- API 키는 서버에서 관리되므로 숨김 처리 -->
-            <div class="api-key-section" style="display: none;">
-                <label for="apiKeyInput" style="font-size: 0.7rem;">Gemini API 키</label>
-                <div class="key-input-wrapper">
-                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="mini-input">
-                    <button id="saveKeyBtn" class="icon-btn"><i class="ph ph-check"></i></button>
-                </div>
-            </div>
-
-            <div class="section-title">내 사주 명식 (만세력)</div>
-
-            <div class="user-mini-profile" id="user-profile-display" style="display:none; margin-bottom: 1rem;">
-                <div class="avatar" id="sidebar-avatar">?</div>
-                <div class="user-info">
-                    <h3 id="display-name">방문자</h3>
-                    <span id="display-birth">생년월일 정보 없음</span>
-                </div>
-            </div>
-
-            <!-- Matrix for 4 Pillars -->
-            <div class="saju-grid">
-                <div class="grid-header">시주</div>
-                <div class="grid-header">일주</div>
-                <div class="grid-header">월주</div>
-                <div class="grid-header">년주</div>
-
-                <!-- Heavely Stems (Cheon-gan) -->
-                <div class="pillar-box" id="hour-stem">?</div>
-                <div class="pillar-box day-master" id="day-stem">?</div>
-                <div class="pillar-box" id="month-stem">?</div>
-                <div class="pillar-box" id="year-stem">?</div>
-
-                <!-- Earthly Branches (Ji-ji) -->
-                <div class="pillar-box" id="hour-branch">?</div>
-                <div class="pillar-box" id="day-branch">?</div>
-                <div class="pillar-box" id="month-branch">?</div>
-                <div class="pillar-box" id="year-branch">?</div>
-            </div>
-
-            <!-- 사주 정보 입력 폼 -->
-            <div class="saju-input-form" id="saju-input-form">
-                <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.7rem;">
-                    <i class="ph ph-note-pencil"></i> 사주 정보 입력
-                </div>
-                <div class="form-row">
-                    <input type="text" id="form-name" placeholder="이름" class="form-input" maxlength="10">
-                </div>
-                <div class="form-row form-row-triple">
-                    <input type="number" id="form-year" placeholder="년 (예: 1990)" class="form-input" min="1900"
-                        max="2100">
-                    <input type="number" id="form-month" placeholder="월" class="form-input" min="1" max="12">
-                    <input type="number" id="form-day" placeholder="일" class="form-input" min="1" max="31">
-                </div>
-                <div class="form-row form-row-double">
-                    <select id="form-hour" class="form-input">
-                        <option value="">시간 선택</option>
-                        <option value="모름">모름</option>
-                        <option value="자시">자시 (23~01시)</option>
-                        <option value="축시">축시 (01~03시)</option>
-                        <option value="인시">인시 (03~05시)</option>
-                        <option value="묘시">묘시 (05~07시)</option>
-                        <option value="진시">진시 (07~09시)</option>
-                        <option value="사시">사시 (09~11시)</option>
-                        <option value="오시">오시 (11~13시)</option>
-                        <option value="미시">미시 (13~15시)</option>
-                        <option value="신시">신시 (15~17시)</option>
-                        <option value="유시">유시 (17~19시)</option>
-                        <option value="술시">술시 (19~21시)</option>
-                        <option value="해시">해시 (21~23시)</option>
+            <div class="saju-input-section">
+                <h4><i class="ph ph-identification-card"></i> 사주 정보 입력</h4>
+                <div class="saju-form">
+                    <input type="text" id="saju-name" placeholder="이름" class="mini-input">
+                    <select id="saju-calendar" class="mini-input">
+                        <option value="양력">양력</option>
+                        <option value="음력">음력</option>
+                        <option value="음력(윤달)">음력(윤달)</option>
                     </select>
-                    <select id="form-gender" class="form-input">
-                        <option value="">성별</option>
+                    <input type="date" id="saju-birth" class="mini-input" value="1990-01-01">
+                    <select id="saju-time" class="mini-input">
+                        <option value="모름">시간 모름</option>
+                        <option value="子時(23:30~01:30)">子時 (23:30~01:30)</option>
+                        <option value="丑時(01:30~03:30)">丑時 (01:30~03:30)</option>
+                        <option value="寅時(03:30~05:30)">寅時 (03:30~05:30)</option>
+                        <option value="卯時(05:30~07:30)">卯時 (05:30~07:30)</option>
+                        <option value="辰時(07:30~09:30)">辰時 (07:30~09:30)</option>
+                        <option value="巳時(09:30~11:30)">巳時 (09:30~11:30)</option>
+                        <option value="午時(11:30~13:30)">午時 (11:30~13:30)</option>
+                        <option value="未時(13:30~15:30)">未時 (13:30~15:30)</option>
+                        <option value="申時(15:30~17:30)">申時 (15:30~17:30)</option>
+                        <option value="酉時(17:30~19:30)">酉時 (17:30~19:30)</option>
+                        <option value="戌時(19:30~21:30)">戌時 (19:30~21:30)</option>
+                        <option value="亥時(21:30~23:30)">亥時 (21:30~23:30)</option>
+                    </select>
+                    <select id="saju-gender" class="mini-input">
                         <option value="남성">남성</option>
                         <option value="여성">여성</option>
                     </select>
+                    <button id="saju-submit-btn" class="submit-btn">
+                        <i class="ph ph-magnifying-glass"></i> 사주 조회
+                    </button>
                 </div>
-                <div class="form-row form-row-double">
-                    <label class="radio-label">
-                        <input type="radio" name="calendar-type" value="양력" checked> 양력
-                    </label>
-                    <label class="radio-label">
-                        <input type="radio" name="calendar-type" value="음력"> 음력
-                    </label>
-                </div>
-                <button id="saju-submit-btn" class="saju-submit-btn">
-                    <i class="ph ph-magnifying-glass"></i> 사주 조회
-                </button>
-            </div>
-
-            <div class="analysis-card">
-                <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
-                <p id="day-master-desc">대화창에 생년월일을 입력하면 이곳에 분석 결과가 표시됩니다.</p>
             </div>
 
             <div class="query-history-section" id="query-history-section" style="display:none;">
@@ -146,16 +336,15 @@
                         onmouseout="this.style.color='var(--text-muted)';this.style.background='none'"><i
                             class="ph ph-trash"></i> 초기화</button>
                 </div>
-                <div class="query-list" id="query-list">
-                    <!-- JS가 동적으로 채움 -->
-                </div>
+                <div class="query-list" id="query-list"></div>
             </div>
             <nav class="sidebar-nav">
-                <a href="index.html" class="active"><i class="ph ph-chat-circle-text"></i> 상담실</a>
+                <a href="index.html" class="active"><i class="ph ph-house"></i> 간단 해설</a>
                 <a href="deep.html"><i class="ph ph-magnifying-glass-plus"></i> 심층 상담</a>
                 <a href="daeun.html"><i class="ph ph-chart-line-up"></i> 대운 흐름</a>
                 <a href="seun.html"><i class="ph ph-calendar-dots"></i> 세운 분석</a>
-                <a href="#"><i class="ph ph-files"></i> 지난 상담</a>
+                <a href="chat.html"><i class="ph ph-chat-circle-text"></i> AI 상담실 <span
+                        style="font-size:.6rem;background:linear-gradient(135deg,#a78bfa,#ec4899);color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px">PRO</span></a>
                 <button class="theme-toggle" id="theme-toggle">
                     <span class="theme-icon"><i class="ph ph-moon"></i></span>
                     <span class="theme-label">라이트 모드</span>
@@ -163,47 +352,16 @@
             </nav>
         </aside>
 
-        <!-- Main Chat Area -->
-        <main class="chat-interface">
-            <header class="chat-header">
-                <div class="agent-info">
-                    <div class="agent-avatar"><i class="ph ph-magic-wand"></i></div>
-                    <div>
-                        <h3>AI 사주 마스터</h3>
-                        <span class="status-indicator">운명 상담 중</span>
-                    </div>
-                </div>
-                <!-- <button class="end-session-btn" onclick="window.location.reload()">세션 종료</button> -->
-            </header>
-
-            <div class="chat-messages" id="chat-history">
-                <!-- Messages will appear here -->
-                <div class="message ai-message system-notice">
-                    <div class="bubble">
-                        <p>안녕하세요. 당신의 운명 전략을 믹싱해드릴 <strong>DJ 명리</strong>입니다.</p>
-                        <p>화면 왼쪽 '사주 정보 입력' 창에 성명과 생년월일시 등의 정보를 먼저 입력해주세요.</p>
-                        <p>입력한 정보는 '조회 목록'에서 확인 및 관리할 수 있습니다.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-input-area">
-                <div class="suggestion-chips" id="suggestion-chips">
-                    <button>💰 올해 재물운은?</button>
-                    <button>💘 연애/결혼운 보기</button>
-                    <button>💼 직장/진로 고민</button>
-                </div>
-                <div class="input-wrapper">
-                    <button class="attach-btn"><i class="ph ph-plus-circle"></i></button>
-                    <input type="text" id="user-input" placeholder="메시지를 입력하세요..." autocomplete="off">
-                    <button class="send-btn" id="send-btn"><i class="ph ph-paper-plane-right"></i></button>
-                </div>
+        <!-- Main: 간단 해설 컨텐츠 -->
+        <main class="overview-page" id="overview-content">
+            <div class="ov-empty">
+                <p>🔮 왼쪽 사이드바에서 사주 정보를 입력해 주세요.</p>
             </div>
         </main>
     </div>
 
     <script src="manseryeok.js"></script>
-    <script src="script.js"></script>
+    <script src="overview.js"></script>
 </body>
 
 </html>
