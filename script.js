@@ -18,6 +18,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     // 페이지 로드 시 저장된 상태 복원
     restoreState();
+
+    // 사주 입력 폼 제출 핸들러
+    const sajuSubmitBtn = document.getElementById('saju-submit-btn');
+    if (sajuSubmitBtn) {
+        sajuSubmitBtn.addEventListener('click', submitSajuForm);
+    }
 });
 
 // Map Element String to CSS Class
@@ -927,4 +933,85 @@ function updateSidebar(data, skipColors = false) {
     if (data.dayMasterAnalysis) {
         document.getElementById('day-master-desc').textContent = data.dayMasterAnalysis;
     }
+}
+
+// ========== 사주 입력 폼 제출 ==========
+function submitSajuForm() {
+    const nameEl = document.getElementById('form-name');
+    const yearEl = document.getElementById('form-year');
+    const monthEl = document.getElementById('form-month');
+    const dayEl = document.getElementById('form-day');
+    const hourEl = document.getElementById('form-hour');
+    const genderEl = document.getElementById('form-gender');
+    const calendarType = document.querySelector('input[name="calendar-type"]:checked');
+
+    const year = yearEl.value.trim();
+    const month = monthEl.value.trim();
+    const day = dayEl.value.trim();
+
+    // 유효성 검사
+    if (!year || !month || !day) {
+        alert('생년월일(년, 월, 일)은 필수 입력입니다.');
+        return;
+    }
+
+    const y = parseInt(year);
+    const m = parseInt(month);
+    const d = parseInt(day);
+
+    if (y < 1900 || y > 2100) {
+        alert('연도는 1900~2100 사이로 입력해 주세요.');
+        return;
+    }
+    if (m < 1 || m > 12) {
+        alert('월은 1~12 사이로 입력해 주세요.');
+        return;
+    }
+    if (d < 1 || d > 31) {
+        alert('일은 1~31 사이로 입력해 주세요.');
+        return;
+    }
+
+    // 텍스트 조합 (parseBirthInfo가 인식하는 형식)
+    const name = nameEl.value.trim() || '';
+    const gender = genderEl.value || '';
+    const hourVal = hourEl.value || '';
+    const calendar = calendarType ? calendarType.value : '양력';
+
+    let message = '';
+
+    // 이름 부분
+    if (name) {
+        message += `이름은 ${name}입니다. `;
+    }
+
+    // 생년월일 부분
+    message += `${y}년 ${m}월 ${d}일`;
+
+    // 시간 부분
+    if (hourVal && hourVal !== '모름') {
+        message += ` ${hourVal}`;
+    }
+
+    // 양음력 부분
+    message += ` (${calendar})`;
+
+    // 성별 부분
+    if (gender) {
+        message += ` ${gender}`;
+    }
+
+    message += ' 사주 풀이 부탁드립니다.';
+
+    // 채팅 입력란에 텍스트 삽입 후 전송
+    userInput.value = message;
+    sendMessage();
+
+    // 폼 초기화
+    nameEl.value = '';
+    yearEl.value = '';
+    monthEl.value = '';
+    dayEl.value = '';
+    hourEl.selectedIndex = 0;
+    genderEl.selectedIndex = 0;
 }

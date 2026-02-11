@@ -73,6 +73,56 @@
                 <div class="pillar-box" id="year-branch">?</div>
             </div>
 
+            <!-- 사주 정보 입력 폼 -->
+            <div class="saju-input-form" id="saju-input-form">
+                <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.7rem;">
+                    <i class="ph ph-note-pencil"></i> 사주 정보 입력
+                </div>
+                <div class="form-row">
+                    <input type="text" id="form-name" placeholder="이름" class="form-input" maxlength="10">
+                </div>
+                <div class="form-row form-row-triple">
+                    <input type="number" id="form-year" placeholder="년 (예: 1990)" class="form-input" min="1900"
+                        max="2100">
+                    <input type="number" id="form-month" placeholder="월" class="form-input" min="1" max="12">
+                    <input type="number" id="form-day" placeholder="일" class="form-input" min="1" max="31">
+                </div>
+                <div class="form-row form-row-double">
+                    <select id="form-hour" class="form-input">
+                        <option value="">시간 선택</option>
+                        <option value="모름">모름</option>
+                        <option value="자시">자시 (23~01시)</option>
+                        <option value="축시">축시 (01~03시)</option>
+                        <option value="인시">인시 (03~05시)</option>
+                        <option value="묘시">묘시 (05~07시)</option>
+                        <option value="진시">진시 (07~09시)</option>
+                        <option value="사시">사시 (09~11시)</option>
+                        <option value="오시">오시 (11~13시)</option>
+                        <option value="미시">미시 (13~15시)</option>
+                        <option value="신시">신시 (15~17시)</option>
+                        <option value="유시">유시 (17~19시)</option>
+                        <option value="술시">술시 (19~21시)</option>
+                        <option value="해시">해시 (21~23시)</option>
+                    </select>
+                    <select id="form-gender" class="form-input">
+                        <option value="">성별</option>
+                        <option value="남성">남성</option>
+                        <option value="여성">여성</option>
+                    </select>
+                </div>
+                <div class="form-row form-row-double">
+                    <label class="radio-label">
+                        <input type="radio" name="calendar-type" value="양력" checked> 양력
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="calendar-type" value="음력"> 음력
+                    </label>
+                </div>
+                <button id="saju-submit-btn" class="saju-submit-btn">
+                    <i class="ph ph-magnifying-glass"></i> 사주 조회
+                </button>
+            </div>
+
             <div class="analysis-card">
                 <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
                 <p id="day-master-desc">대화창에 생년월일을 입력하면 이곳에 분석 결과가 표시됩니다.</p>
