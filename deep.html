@@ -736,6 +736,16 @@
             init();
         })();
     </script>
+    <script src="paywall.js"></script>
+    <script>
+        // 프리미엄 체크: 사주 데이터 있을 때만 적용
+        (function () {
+            const hasSaju = !!localStorage.getItem('sajuData');
+            if (hasSaju && !window.SajuPaywall.isPremium()) {
+                window.SajuPaywall.showPaywall(document.querySelector('.deep-content'));
+            }
+        })();
+    </script>
 </body>
 
 </html>

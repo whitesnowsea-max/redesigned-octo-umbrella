@@ -905,6 +905,15 @@
             initPage();
         })();
     </script>
+    <script src="paywall.js"></script>
+    <script>
+        (function () {
+            const hasSaju = !!localStorage.getItem('sajuData');
+            if (hasSaju && !window.SajuPaywall.isPremium()) {
+                window.SajuPaywall.showPaywall(document.querySelector('.seun-page'));
+            }
+        })();
+    </script>
 </body>
 
 </html>
