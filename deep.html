@@ -310,6 +310,13 @@
                     <h4><i class="ph ph-star-four"></i> 일간 (본원) 분석</h4>
                     <p id="day-master-desc">대화창에서 사주를 먼저 뽑아주세요.</p>
                 </div>
+
+                <div class="query-history-section" id="query-history-section" style="display:none;">
+                    <div class="section-title" style="margin-top: 0.5rem; font-size: 0.7rem;">
+                        <i class="ph ph-users-three"></i> 조회 목록
+                    </div>
+                    <div class="query-list" id="query-list"></div>
+                </div>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html"><i class="ph ph-chat-circle-text"></i> 상담실</a>
@@ -506,7 +513,37 @@
                 html += `</div>`;
 
                 document.getElementById('deep-loaded').innerHTML = html;
+                renderQueryList();
             }
+
+            function renderQueryList() {
+                const section = document.getElementById('query-history-section');
+                const list = document.getElementById('query-list');
+                if (!section || !list) return;
+                const queryStr = localStorage.getItem('queryList');
+                if (!queryStr) return;
+                let queryList;
+                try { queryList = JSON.parse(queryStr); } catch (e) { return; }
+                if (!queryList || queryList.length === 0) return;
+                section.style.display = 'block';
+                list.innerHTML = '';
+                queryList.forEach((q, idx) => {
+                    const item = document.createElement('div');
+                    item.className = `query-item ${q.active ? 'active' : ''}`;
+                    item.onclick = () => {
+                        queryList.forEach(qq => qq.active = false);
+                        queryList[idx].active = true;
+                        localStorage.setItem('queryList', JSON.stringify(queryList));
+                        localStorage.setItem('sajuData', JSON.stringify(q.chartData));
+                        location.reload();
+                    };
+                    const genderIcon = q.gender === '여성' ? '♀' : q.gender === '남성' ? '♂' : '?';
+                    const shortBirth = q.birth.replace(/\s*\(.*\)/, '');
+                    item.innerHTML = `<div class="qi-avatar">${genderIcon}</div><div class="qi-info"><div class="qi-birth">${shortBirth}</div><div class="qi-gender">${q.gender} · ${q.name}</div></div>`;
+                    list.appendChild(item);
+                });
+            }
+
             init();
         })();
     </script>
